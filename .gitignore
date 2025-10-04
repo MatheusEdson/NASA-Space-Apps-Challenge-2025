@@ -1,0 +1,57 @@
+# NASA Space Apps Challenge 2025
+# Ignorar arquivos desnecessários
+
+# Modelos ML treinados
+models/*.joblib
+models/*.pkl
+models/*.h5
+
+# Dados gerados
+data/*.csv
+data/*.xlsx
+data/*.parquet
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Logs
+*.log
+logs/
+*.out
+
+# Arquivos de teste temporários
+test_*.py
+demo_*.py
+simple_*.py
+final_*.py
+
+# Ambientes virtuais
+env/
+venv/
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Arquivos de backup
+*.bak
+*.backup
+*.tar.gz
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Node modules (se adicionar frontend)
+node_modules/
+npm-debug.log*
