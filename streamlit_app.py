@@ -114,6 +114,20 @@ def main():
         
         # Upload de dados
         st.subheader("📂 Upload de Dados")
+        
+        # Download da planilha padrão
+        st.markdown("**📋 Planilha Padrão:**")
+        with open('exoplanet_template.csv', 'r') as f:
+            csv_content = f.read()
+        
+        st.download_button(
+            label="📥 Baixar Template CSV",
+            data=csv_content,
+            file_name="exoplanet_template.csv",
+            mime="text/csv",
+            help="Use este template como base para seus dados"
+        )
+        
         uploaded_file = st.file_uploader("Carregar dataset:", type=['csv', 'xlsx'])
         
         if uploaded_file:
@@ -196,15 +210,43 @@ def main():
         
         with col_right:
             # Distribuição das classificações
-            st.subheader("🥧 Distribuição Atual")
+            st.subheader("🌍 Distribuição Planetária")
             
             labels = ['Confirmados', 'Candidatos', 'Falsos Positivos']
             values = [real_time_data['confirmed_exoplanets'], 
                      real_time_data['candidates'], 
                      real_time_data['false_positives']]
             
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values)])
-            fig_pie.update_layout(height=300)
+            # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
+            planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
+            
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels, 
+                values=values,
+                marker=dict(colors=planet_colors),
+                textinfo='label+percent',
+                textfont_size=12,
+                hovertemplate='<b>%{label}</b><br>' +
+                             'Quantidade: %{value}<br>' +
+                             'Percentual: %{percent}<br>' +
+                             '<extra></extra>'
+            )])
+            
+            fig_pie.update_layout(
+                height=350,
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="left",
+                    x=1.01
+                ),
+                title=dict(
+                    text="🌌 Classificação de Exoplanetas",
+                    font=dict(size=16, color='#2E8B57')
+                )
+            )
             
             st.plotly_chart(fig_pie, use_container_width=True)
     
@@ -367,6 +409,23 @@ def main():
         - **Profundidade**: Redução no brilho estelar
         - **Raio Planetário**: Tamanho relativo à Terra
         - **Temperatura de Equilíbrio**: Estimativa térmica
+        
+        ### 📋 Formato da Planilha Padrão
+        
+        **Colunas Obrigatórias:**
+        ```
+        koi_name          - Nome do objeto (ex: KOI-1.01)
+        koi_period        - Período orbital em dias
+        koi_depth         - Profundidade do trânsito
+        koi_duration      - Duração do trânsito em horas
+        koi_prad          - Raio planetário em raios terrestres
+        koi_teq           - Temperatura de equilíbrio em Kelvin
+        koi_insol         - Irradiação estelar
+        koi_impact        - Parâmetro de impacto
+        koi_disposition   - Classificação (CONFIRMED/CANDIDATE/FALSE POSITIVE)
+        ```
+        
+        **💡 Dica:** Use o botão "📥 Baixar Template CSV" na sidebar para obter um exemplo completo!
         
         
         ### 🎯 Classificações
