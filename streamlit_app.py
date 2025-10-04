@@ -120,7 +120,7 @@ def main():
             st.success(f"Arquivo carregado: {uploaded_file.name}")
     
     # Layout principal com tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🔍 Análise", Ativo": status_color})
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🔍 Análise", "🤖 Performance", "📚 Documentação"])
     
     # Barra de progresso da análise atual
     progress_bar = st.progress(0)
