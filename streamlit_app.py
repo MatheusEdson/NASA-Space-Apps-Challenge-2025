@@ -645,7 +645,7 @@ def main():
 
         pred_labels = [get_translation("confirmed", selected_language), get_translation("candidate", selected_language), get_translation("false_positive", selected_language)]
 
-            st.subheader(get_translation("prediction_result", selected_language))
+        st.subheader(get_translation("prediction_result", selected_language))
 
         col_r1, col_r2, col_r3 = st.columns(3)
 
