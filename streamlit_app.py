@@ -18,7 +18,7 @@ from exoplanet_ml import ExoplanetDetector
 # Configurar página
 st.set_page_config(
     page_title="Detecção de Exoplanetas com IA",
-    page_icon="🚀",
+    page_icon="🌌",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -28,92 +28,156 @@ st.set_page_config(
 def initialize_detector():
     return ExoplanetDetector()
 
-# CSS customizado
+# CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fonte limpa e moderna - usar fonte do sistema para performance */
-    body, .css-18e3th9, .main {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-            Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        background: #f9f9fb;
-        color: #222222;
+    /* Fundo estrelado animado */
+    body {
+        background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        overflow-x: hidden;
     }
-
-    /* Título principal */
+    
+    .stars {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        animation: twinkle 3s infinite;
+    }
+    
+    .star:nth-child(1) { top: 20%; left: 10%; width: 2px; height: 2px; animation-delay: 0s; }
+    .star:nth-child(2) { top: 30%; left: 20%; width: 1px; height: 1px; animation-delay: 0.5s; }
+    .star:nth-child(3) { top: 15%; left: 30%; width: 3px; height: 3px; animation-delay: 1s; }
+    .star:nth-child(4) { top: 40%; left: 15%; width: 1px; height: 1px; animation-delay: 1.5s; }
+    .star:nth-child(5) { top: 25%; left: 40%; width: 2px; height: 2px; animation-delay: 2s; }
+    .star:nth-child(6) { top: 35%; left: 50%; width: 1px; height: 1px; animation-delay: 2.5s; }
+    .star:nth-child(7) { top: 20%; left: 60%; width: 2px; height: 2px; animation-delay: 0.8s; }
+    .star:nth-child(8) { top: 45%; left: 70%; width: 1px; height: 1px; animation-delay: 1.3s; }
+    .star:nth-child(9) { top: 30%; left: 80%; width: 3px; height: 3px; animation-delay: 1.8s; }
+    .star:nth-child(10) { top: 15%; left: 90%; width: 1px; height: 1px; animation-delay: 2.3s; }
+    .star:nth-child(11) { top: 50%; left: 25%; width: 2px; height: 2px; animation-delay: 0.3s; }
+    .star:nth-child(12) { top: 60%; left: 45%; width: 1px; height: 1px; animation-delay: 0.7s; }
+    .star:nth-child(13) { top: 70%; left: 65%; width: 2px; height: 2px; animation-delay: 1.2s; }
+    .star:nth-child(14) { top: 80%; left: 35%; width: 1px; height: 1px; animation-delay: 1.7s; }
+    .star:nth-child(15) { top: 90%; left: 55%; width: 3px; height: 3px; animation-delay: 2.2s; }
+    
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.2); }
+    }
+    
     .main-header {
-        font-size: 2.8rem;
-        color: #334e68;
+        font-size: 3rem;
+        color: #ffffff;
         text-align: center;
         margin-bottom: 2rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
     }
-
-    /* Cartões métricos */
+    
     .metric-card {
-        background: #ffffff;
-        padding: 1.2rem;
-        border-radius: 12px;
-        margin: 0.5rem 0;
-        box-shadow: 0 4px 8px rgba(51, 78, 104, 0.1);
-        color: #334e68;
-        text-align: center;
-        font-weight: 600;
-        transition: box-shadow 0.3s ease;
-    }
-    .metric-card:hover {
-        box-shadow: 0 6px 12px rgba(51, 78, 104, 0.15);
-    }
-
-    /* Status */
-    .status-running {
-        color: #2a9d8f;
-        font-weight: 700;
-    }
-
-    .status-stopped {
-        color: #e76f51;
-        font-weight: 700;
-    }
-
-    /* Botões estilizados */
-    div.stButton > button {
-        background: #2a9d8f;
-        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 0.5rem;
         color: white;
-        font-weight: 600;
-        padding: 0.5rem 1.2rem;
-        border: none;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 6px rgba(42, 157, 143, 0.3);
+        text-align: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    div.stButton > button:hover {
-        background-color: #21867a;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(33, 134, 122, 0.5);
+    
+    .status-running {
+        color: #00ff88;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
     }
-
-    /* Tabs customizadas */
-    .css-1d391kg {
-        font-weight: 600;
-        color: #334e68;
+    
+    .status-stopped {
+        color: #ff4444;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
     }
-    .css-1d391kg[aria-selected="true"] {
-        color: #2a9d8f;
-        border-bottom: 3px solid #2a9d8f;
+    
+    /* Transparência para elementos Streamlit */
+    .stApp > header {
+        background-color: rgba(14, 17, 23, 0.8);
     }
-
-    /* Pequeno ajuste nos sliders */
-    .stSlider > div > div > input[type=range] {
-        accent-color: #2a9d8f;
+    
+    .stApp {
+        background-color: transparent;
+    }
+    
+    .main .block-container {
+        background-color: rgba(14, 17, 23, 0.1);
+        backdrop-filter: blur(10px);
     }
 </style>
+
+<div class="stars">
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+</div>
 """, unsafe_allow_html=True)
 
 # Inicializar sistema
 @st.cache_resource
 def initialize_detector():
     return ExoplanetDetector()
+
+# Sistema de imagens planetárias aleatórias
+@st.cache_data(ttl=300)  # Cache por 5 minutos para manter consistência
+def get_random_planet_images():
+    """Retorna URLs de imagens de planetas aleatórias"""
+    planet_images = {
+        'earth': [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/200px-The_Earth_seen_from_Apollo_17.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Earth_from_Space.jpg/200px-Earth_from_Space.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Earth_Western_Hemisphere.jpg/200px-Earth_Western_Hemisphere.jpg'
+        ],
+        'mars': [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/200px-OSIRIS_Mars_true_color.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Mars_23_aug_2003_hubble.jpg/200px-Mars_23_aug_2003_hubble.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Mars_Hubble.jpg/200px-Mars_Hubble.jpg'
+        ],
+        'neptune': [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg/200px-Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/200px-Neptune_Full.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Neptune.jpg/200px-Neptune.jpg'
+        ]
+    }
+    
+    # Selecionar imagens aleatórias para cada categoria
+    import random
+    selected_images = {}
+    for planet_type, urls in planet_images.items():
+        selected_images[planet_type] = random.choice(urls)
+    
+    return selected_images
 
 # Cache para dados simulados em tempo real
 @st.cache_data(ttl=10)
@@ -270,17 +334,52 @@ def main():
                      real_time_data['candidates'], 
                      real_time_data['false_positives']]
             
-            planet_colors = ['#4169E1', '#FF4500', '#1E90FF']
+            # Obter imagens aleatórias dos planetas
+            planet_images = get_random_planet_images()
+            
+            # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
+            planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
             
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
-                marker_colors=planet_colors,
-                hole=0.4
+                marker=dict(colors=planet_colors),
+                textinfo='label+percent',
+                textfont_size=12,
+                hovertemplate='<b>%{label}</b><br>' +
+                             'Quantidade: %{value}<br>' +
+                             'Percentual: %{percent}<br>' +
+                             '<extra></extra>'
             )])
-            fig_pie.update_layout(height=300, margin=dict(t=0,b=0,l=0,r=0))
+            
+            fig_pie.update_layout(
+                height=350,
+                showlegend=True,
+                legend=dict(
+                    orientation="v",
+                    yanchor="middle",
+                    y=0.5,
+                    xanchor="left",
+                    x=1.01
+                ),
+                title=dict(
+                    text="Classificação de Exoplanetas",
+                    font=dict(size=16, color='#2E8B57')
+                )
+            )
             
             st.plotly_chart(fig_pie, use_container_width=True)
+            
+            # Mostrar imagens dos planetas selecionados
+            st.markdown("**Planetas Representativos:**")
+            col_earth, col_mars, col_neptune = st.columns(3)
+            
+            with col_earth:
+                st.image(planet_images['earth'], width=80, caption="Terra - Confirmados")
+            with col_mars:
+                st.image(planet_images['mars'], width=80, caption="Marte - Candidatos")
+            with col_neptune:
+                st.image(planet_images['neptune'], width=80, caption="Netuno - Falsos Positivos")
     
     with tab2:
         st.header("Análise Manual")
@@ -393,9 +492,9 @@ def main():
         st.plotly_chart(fig_comparison, use_container_width=True)
     
     with tab4:
-        st.header("📚 Documentação e Recursos")
+        st.header("Documentação e Recursos")
         
-        st.subheader("🌌 Sobre o Sistema")
+        st.subheader("Sobre o Sistema")
         st.markdown("""
         Este sistema utiliza **Inteligência Artificial** para identificar e classificar exoplanetas 
         usando dados das missões Kepler, K2 e TESS da NASA.
@@ -414,7 +513,7 @@ def main():
         - **LightGBM**: Eficiência computacional otimizada
         - **Ensemble**: Combinação para máxima robustez
         
-        ### 📊 Variáveis de Análise
+        ### Variáveis de Análise
         
         - **Período Orbital**: Duração da órbita do planeta
         - **Duração do Trânsito**: Tempo de transição
@@ -422,7 +521,7 @@ def main():
         - **Raio Planetário**: Tamanho relativo à Terra
         - **Temperatura de Equilíbrio**: Estimativa térmica
         
-        ### 📋 Formato da Planilha Padrão
+        ### Formato da Planilha Padrão
         
         **Colunas Obrigatórias:**
         ```
@@ -437,16 +536,16 @@ def main():
         koi_disposition   - Classificação (CONFIRMED/CANDIDATE/FALSE POSITIVE)
         ```
         
-        **💡 Dica:** Use o botão "📥 Baixar Template CSV" na sidebar para obter um exemplo completo!
+        **Dica:** Use o botão "Baixar Template CSV" na sidebar para obter um exemplo completo!
         
         
-        ### 🎯 Classificações
+        ### Classificações
         
-        - ✅ **Confirmado**: Planeta validado por múltiplas observações
-        - 🔍 **Candidato**: Requer validação adicional
-        - ❌ **Falso Positivo**: Fenômeno estelar não planetário
+        - **Confirmado**: Planeta validado por múltiplas observações
+        - **Candidato**: Requer validação adicional
+        - **Falso Positivo**: Fenômeno estelar não planetário
         
-        ### 🛠️ Recursos Técnicos
+        ### Recursos Técnicos
         
         - Interface web responsiva com Streamlit
         - Visualizações interativas com Plotly
