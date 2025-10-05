@@ -17,43 +17,95 @@ from exoplanet_ml import ExoplanetDetector
 
 # Configurar página
 st.set_page_config(
-    page_title="🌌 Detecção de Exoplanetas com IA",
+    page_title="Detecção de Exoplanetas com IA",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Inicializar detector (exemplo)
+@st.cache_resource
+def initialize_detector():
+    return ExoplanetDetector()
+
 # CSS customizado
 st.markdown("""
 <style>
+    /* Fonte limpa e moderna - usar fonte do sistema para performance */
+    body, .css-18e3th9, .main {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+            Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background: #f9f9fb;
+        color: #222222;
+    }
+
+    /* Título principal */
     .main-header {
-        font-size: 3rem;
-        color: #1f77b4;
+        font-size: 2.8rem;
+        color: #334e68;
         text-align: center;
         margin-bottom: 2rem;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        font-weight: 700;
+        letter-spacing: -0.02em;
     }
-    
+
+    /* Cartões métricos */
     .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 0.5rem;
-        color: white;
+        background: #ffffff;
+        padding: 1.2rem;
+        border-radius: 12px;
+        margin: 0.5rem 0;
+        box-shadow: 0 4px 8px rgba(51, 78, 104, 0.1);
+        color: #334e68;
         text-align: center;
+        font-weight: 600;
+        transition: box-shadow 0.3s ease;
     }
-    
+    .metric-card:hover {
+        box-shadow: 0 6px 12px rgba(51, 78, 104, 0.15);
+    }
+
+    /* Status */
     .status-running {
-        color: #00ff00;
-        font-weight: bold;
+        color: #2a9d8f;
+        font-weight: 700;
     }
-    
+
     .status-stopped {
-        color: #ff0000;
-        font-weight: bold;
+        color: #e76f51;
+        font-weight: 700;
+    }
+
+    /* Botões estilizados */
+    div.stButton > button {
+        background: #2a9d8f;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        border: none;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 2px 6px rgba(42, 157, 143, 0.3);
+    }
+    div.stButton > button:hover {
+        background-color: #21867a;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(33, 134, 122, 0.5);
+    }
+
+    /* Tabs customizadas */
+    .css-1d391kg {
+        font-weight: 600;
+        color: #334e68;
+    }
+    .css-1d391kg[aria-selected="true"] {
+        color: #2a9d8f;
+        border-bottom: 3px solid #2a9d8f;
+    }
+
+    /* Pequeno ajuste nos sliders */
+    .stSlider > div > div > input[type=range] {
+        accent-color: #2a9d8f;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -84,44 +136,45 @@ def get_real_time_data():
     return data
 
 def main():
+
     # Header principal
-    st.markdown('<h1 class="main-header">🌌 Sistema de Detecção de Exoplanetas com IA</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">Sistema de Detecção de Exoplanetas com IA</h1>', unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
-        st.header("🎛️ Controles do Sistema")
+        st.header("Controles do Sistema")
         
         # Status do sistema
         st.subheader("Status do Sistema")
-        system_status = st.radio("Status:", ["🟢 Ativo", "🔴 Pausado"], key="status")
+        system_status = st.radio("Status:", ["Ativo", "Pausado"], key="status")
         
-        if system_status == "🟢 Ativo":
+        if system_status == "Ativo":
             st.markdown('<p class="status-running">● Sistema ATIVO</p>', unsafe_allow_html=True)
         else:
             st.markdown('<p class="status-stopped">● Sistema PAUSADO</p>', unsafe_allow_html=True)
         
         # Seleção de modelo
-        st.subheader("🤖 Modelo Ativo")
+        st.subheader("Modelo Ativo")
         model_option = st.selectbox(
             "Escolha o modelo:",
             ["Random Forest", "XGBoost", "LightGBM", "Ensemble"]
         )
         
         # Configurações
-        st.subheader("⚙️ Configurações")
+        st.subheader("Configurações")
         update_interval = st.slider("Intervalo de atualização (segundos):", 1, 30, 5)
         confidence_threshold = st.slider("Limiar de confiança:", 0.0, 1.0, 0.8)
         
         # Upload de dados
-        st.subheader("📂 Upload de Dados")
+        st.subheader("Upload de Dados")
         
         # Download da planilha padrão
-        st.markdown("**📋 Planilha Padrão:**")
+        st.markdown("**Planilha Padrão:**")
         with open('exoplanet_template.csv', 'r') as f:
             csv_content = f.read()
         
         st.download_button(
-            label="📥 Baixar Template CSV",
+            label="Baixar Template CSV",
             data=csv_content,
             file_name="exoplanet_template.csv",
             mime="text/csv",
@@ -134,28 +187,28 @@ def main():
             st.success(f"Arquivo carregado: {uploaded_file.name}")
     
     # Layout principal com tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🔍 Análise", "🤖 Performance", "📚 Documentação"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Dashboard", "Análise", "Performance", "Documentação"])
     
     # Barra de progresso da análise atual
     progress_bar = st.progress(0)
     status_text = st.empty()
     
     with tab1:
-        st.header("📊 Dashboard em Tempo Real")
+        st.header("Dashboard em Tempo Real")
         
         # Auto-refresh
-        if st.button("🔄 Atualizar Dados") or system_status == "🟢 Ativo":
+        if st.button("Atualizar Dados") or system_status == "Ativo":
             # Simular atualização em tempo real
             for i in range(101):
                 progress_bar.progress(i)
                 if i < 50:
-                    status_text.text("🔍 Analisando dados de transito...")
+                    status_text.text("Analisando dados de trânsito...")
                 elif i < 80:
-                    status_text.text("🧮 Calculando probabilidades...")
+                    status_text.text("Calculando probabilidades...")
                 elif i < 95:
-                    status_text.text("🤖 Executando modelo ML...")
+                    status_text.text("Executando modelo ML...")
                 else:
-                    status_text.text("✅ Análise concluída!")
+                    status_text.text("Análise concluída!")
                 time.sleep(0.02)
             
             # Limpar interface
@@ -168,23 +221,23 @@ def main():
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("🌍 Objetos Analisados", f"{real_time_data['objects_analyzed']:,}")
+            st.metric("Objetos Analisados", f"{real_time_data['objects_analyzed']:,}")
         
         with col2:
-            st.metric("✅ Confirmados", f"{real_time_data['confirmed_exoplanets']}", "+5")
+            st.metric("Confirmados", f"{real_time_data['confirmed_exoplanets']}", "+5")
         
         with col3:
-            st.metric("🔍 Candidatos", f"{real_time_data['candidates']}", "+12")
+            st.metric("Candidatos", f"{real_time_data['candidates']}", "+12")
         
         with col4:
-            st.metric("❌ Falsos Positivos", f"{real_time_data['false_positives']}", "-3")
+            st.metric("Falsos Positivos", f"{real_time_data['false_positives']}", "-3")
         
         # Gráficos em tempo real
         col_left, col_right = st.columns(2)
         
         with col_left:
             # Gráfico de acurácia ao longo do tempo
-            st.subheader("📈 Acurácia do Modelo")
+            st.subheader("Acurácia do Modelo")
             
             # Simular dados históricos de acurácia
             timestamps = pd.date_range(end=datetime.now(), periods=50, freq='min')
@@ -196,7 +249,7 @@ def main():
                 y=accuracy_history,
                 mode='lines+markers',
                 name='Acurácia',
-                line=dict(color='#667eea', width=3)
+                line=dict(color='#2a9d8f', width=3)
             ))
             
             fig_accuracy.update_layout(
@@ -210,174 +263,133 @@ def main():
         
         with col_right:
             # Distribuição das classificações
-            st.subheader("🌍 Distribuição Planetária")
+            st.subheader("Distribuição Planetária")
             
             labels = ['Confirmados', 'Candidatos', 'Falsos Positivos']
             values = [real_time_data['confirmed_exoplanets'], 
                      real_time_data['candidates'], 
                      real_time_data['false_positives']]
             
-            # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
-            planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
+            planet_colors = ['#4169E1', '#FF4500', '#1E90FF']
             
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
-                marker=dict(colors=planet_colors),
-                textinfo='label+percent',
-                textfont_size=12,
-                hovertemplate='<b>%{label}</b><br>' +
-                             'Quantidade: %{value}<br>' +
-                             'Percentual: %{percent}<br>' +
-                             '<extra></extra>'
+                marker_colors=planet_colors,
+                hole=0.4
             )])
-            
-            fig_pie.update_layout(
-                height=350,
-                showlegend=True,
-                legend=dict(
-                    orientation="v",
-                    yanchor="middle",
-                    y=0.5,
-                    xanchor="left",
-                    x=1.01
-                ),
-                title=dict(
-                    text="🌌 Classificação de Exoplanetas",
-                    font=dict(size=16, color='#2E8B57')
-                )
-            )
+            fig_pie.update_layout(height=300, margin=dict(t=0,b=0,l=0,r=0))
             
             st.plotly_chart(fig_pie, use_container_width=True)
     
     with tab2:
-        st.header("🔍 Análise Detalhada")
-        
-        # Inicializar detector se ainda não foi feito
-        detector = initialize_detector()
-        
-        # Treinamento do modelo
-        if st.button("🚀 Treinar Modelos"):
-            with st.spinner("Treinando modelos... Isso pode levar alguns minutos"):
-                # Preparar dados de exemplo
-                df = detector.prepare_sample_data()
-                
-                # Pré-processamento
-                processed_df, features = detector.preprocess_data(df)
-                
-                # Treinamento
-                results, X_test, y_test = detector.train_models(processed_df, features)
-                
-                st.success("✅ Modelos treinados com sucesso!")
-        
-        # Entrada manual de dados
-        st.subheader("📝 Análise Manual")
-        
+        st.header("Análise Manual")
+
         col_p1, col_p2, col_p3 = st.columns(3)
-        
+
         with col_p1:
             orbital_period = st.number_input("Período Orbital (dias):", min_value=0.1, value=365.25)
             transit_duration = st.number_input("Duração do Trânsito (horas):", min_value=0.1, value=8.0)
             planet_radius = st.number_input("Raio Planetário (Terra):", min_value=0.1, value=1.0)
-        
+
         with col_p2:
             stellar_mass = st.number_input("Massa Estelar (Solar):", min_value=0.1, value=1.0)
             stellar_radius = st.number_input("Raio Estelar (Solar):", min_value=0.1, value=1.0)
-            equilibrium_temp = st.number_input("Temperatura Equilibrio (K):", min_value=100.0, value=300.0)
-        
+            equilibrium_temp = st.number_input("Temperatura de Equilíbrio (K):", min_value=100.0, value=300.0)
+
         with col_p3:
             impact_parameter = st.number_input("Parâmetro de Impacto:", min_value=0.0, max_value=1.0, value=0.5)
             stellar_density = st.number_input("Densidade Estelar (g/cm³):", min_value=0.1, value=1.4)
             kepmag = st.number_input("Magnitude Kepler:", min_value=8.0, max_value=16.0, value=12.0)
-        
-        if st.button("🔬 Analisar Dados"):
-            # Preparar dados para análise
-            input_data = [orbital_period, transit_duration, planet_radius, 
-                         stellar_mass, stellar_radius, equilibrium_temp,
-                         impact_parameter, stellar_density, kepmag]
-            
-            # Simular predição (substitua por detector.predict_exoplanet() quando modelos estiverem treinados)
-            pred_probs = np.random.uniform(0, 1, 3)
-            pred_probs = pred_probs / pred_probs.sum()
-            
-            pred_labels = ['CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE']
-            
-            # Mostrar resultados
-            st.subheader("🎯 Resultados da Análise")
-            
-            col_r1, col_r2, col_r3 = st.columns(3)
-            
-            with col_r1:
-                st.metric("Confirmado", f"{pred_probs[0]:.2%}", f"{pred_probs[0]*100:.1f}%")
-            
-            with col_r2:
-                st.metric("Candidato", f"{pred_probs[1]:.2%}", f"{pred_probs[1]*100:.1f}%")
-            
-            with col_r3:
-                st.metric("Falso Positivo", f"{pred_probs[2]:.2%}", f"{pred_probs[2]*100:.1f}%")
-            
-            # Gráfico de probabilidades
-            fig_probs = go.Figure(data=[
-                go.Bar(x=pred_labels, y=pred_probs, 
-                      marker_color=['#2E8B57', '#FFA500', '#DC143C'])
-            ])
-            fig_probs.update_layout(
-                title="Probabilidades de Classificação",
-                yaxis_title="Probabilidade",
-                height=400
-            )
-            st.plotly_chart(fig_probs, use_container_width=True)
-    
+
+        if st.button("Analisar Dados"):
+            input_data = [
+            orbital_period, transit_duration, planet_radius,
+            stellar_mass, stellar_radius, equilibrium_temp,
+            impact_parameter, stellar_density, kepmag
+        ]
+
+        # Simulação das probabilidades para exemplo:
+        pred_probs = np.random.uniform(0, 1, 3)
+        pred_probs /= pred_probs.sum()
+
+        pred_labels = ['Confirmado', 'Candidato', 'Falso Positivo']
+
+        st.subheader("Resultados da Análise")
+
+        col_r1, col_r2, col_r3 = st.columns(3)
+
+        with col_r1:
+            st.metric("Confirmado", f"{pred_probs[0]:.2%}")
+
+        with col_r2:
+            st.metric("Candidato", f"{pred_probs[1]:.2%}")
+
+        with col_r3:
+            st.metric("Falso Positivo", f"{pred_probs[2]:.2%}")
+
+        fig_probs = go.Figure(data=[
+            go.Bar(x=pred_labels, y=pred_probs, marker_color=['#2E8B57', '#FFA500', '#DC143C'])
+        ])
+
+        fig_probs.update_layout(
+            title="Probabilidades de Classificação",
+            yaxis_title="Probabilidade",
+            height=400
+        )
+
+        st.plotly_chart(fig_probs, use_container_width=True)
+
     with tab3:
-        st.header("🤖 Performance dos Modelos")
-        
-        # Simular dados de performance
+        st.header("Performance dos Modelos")
+
+    # Simular dados de performance
         models = ['Random Forest', 'XGBoost', 'LightGBM']
         accuracy = [0.91, 0.93, 0.89]
         precision = [0.88, 0.92, 0.87]
         recall = [0.90, 0.91, 0.89]
         f1_score = [0.89, 0.91, 0.88]
-        
-        # Métricas por modelo
+
+    # Métricas por modelo
         col_m1, col_m2, col_m3 = st.columns(3)
-        
+
         with col_m1:
             st.subheader("Random Forest")
             st.metric("Acurácia", f"{accuracy[0]:.1%}")
             st.metric("Precisão", f"{precision[0]:.1%}")
             st.metric("Recall", f"{recall[0]:.1%}")
             st.metric("F1-Score", f"{f1_score[0]:.1%}")
-        
+
         with col_m2:
             st.subheader("XGBoost")
             st.metric("Acurácia", f"{accuracy[1]:.1%}")
             st.metric("Precisão", f"{precision[1]:.1%}")
             st.metric("Recall", f"{recall[1]:.1%}")
             st.metric("F1-Score", f"{f1_score[1]:.1%}")
-        
+
         with col_m3:
             st.subheader("LightGBM")
             st.metric("Acurácia", f"{accuracy[2]:.1%}")
             st.metric("Precisão", f"{precision[2]:.1%}")
             st.metric("Recall", f"{recall[2]:.1%}")
             st.metric("F1-Score", f"{f1_score[2]:.1%}")
-        
-        # Gráfico comparativo
+
+    # Gráfico comparativo
         fig_comparison = go.Figure()
-        
+
         fig_comparison.add_trace(go.Bar(name='Acurácia', x=models, y=accuracy, marker_color='#667eea'))
         fig_comparison.add_trace(go.Bar(name='Precisão', x=models, y=precision, marker_color='#764ba2'))
         fig_comparison.add_trace(go.Bar(name='Recall', x=models, y=recall, marker_color='#f093fb'))
         fig_comparison.add_trace(go.Bar(name='F1-Score', x=models, y=f1_score, marker_color='#f5576c'))
-        
+
         fig_comparison.update_layout(
-            title="Comparação de Métricas por Modelo",
-            xaxis_title="Modelos",
-            yaxis_title="Score",
-            barmode='group',
-            height=400
-        )
-        
+        title="Comparação de Métricas por Modelo",
+        xaxis_title="Modelos",
+        yaxis_title="Score",
+        barmode='group',
+        height=400
+    )
+
         st.plotly_chart(fig_comparison, use_container_width=True)
     
     with tab4:
@@ -468,11 +480,6 @@ results = detector.train_models(processed_df, features)
 prediction = detector.predict_exoplanet(data_point)
 print(f"Classificação: {prediction['ensemble_prediction']}")
         """)
-
-# Auto-refresh para simulação de tempo real
-if st.session_state.get('auto_refresh', False):
-    time.sleep(5)
-    st.rerun()
 
 if __name__ == "__main__":
     main()
