@@ -248,6 +248,11 @@ def initialize_detector():
 st.markdown("""
 <style>
     /* Fundo estrelado animado - aplicado diretamente ao body */
+    html, body {
+        background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%) !important;
+        background-attachment: fixed !important;
+    }
+    
     .stApp {
         background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%) !important;
         background-attachment: fixed !important;
@@ -259,24 +264,28 @@ st.markdown("""
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-image: 
             radial-gradient(2px 2px at 20px 30px, white, transparent),
             radial-gradient(2px 2px at 40px 70px, white, transparent),
             radial-gradient(1px 1px at 90px 40px, white, transparent),
             radial-gradient(1px 1px at 130px 80px, white, transparent),
-            radial-gradient(2px 2px at 160px 30px, white, transparent);
+            radial-gradient(2px 2px at 160px 30px, white, transparent),
+            radial-gradient(1px 1px at 200px 50px, white, transparent),
+            radial-gradient(2px 2px at 250px 20px, white, transparent),
+            radial-gradient(1px 1px at 300px 80px, white, transparent);
         background-repeat: repeat;
-        background-size: 200px 100px;
-        animation: sparkle 3s linear infinite;
+        background-size: 300px 200px;
+        animation: sparkle 4s linear infinite;
         pointer-events: none;
         z-index: -1;
     }
     
     @keyframes sparkle {
-        from { transform: translateY(0px); }
-        to { transform: translateY(-100px); }
+        0% { transform: translateY(0px); opacity: 0.3; }
+        50% { opacity: 1; }
+        100% { transform: translateY(-200px); opacity: 0.3; }
     }
     
     /* Estrelas adicionais */
@@ -285,16 +294,18 @@ st.markdown("""
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-image: 
             radial-gradient(1px 1px at 50px 50px, white, transparent),
             radial-gradient(1px 1px at 100px 100px, white, transparent),
             radial-gradient(1px 1px at 150px 150px, white, transparent),
-            radial-gradient(1px 1px at 200px 200px, white, transparent);
+            radial-gradient(1px 1px at 200px 200px, white, transparent),
+            radial-gradient(1px 1px at 350px 100px, white, transparent),
+            radial-gradient(1px 1px at 400px 250px, white, transparent);
         background-repeat: repeat;
-        background-size: 250px 250px;
-        animation: sparkle 4s linear infinite reverse;
+        background-size: 400px 300px;
+        animation: sparkle 6s linear infinite reverse;
         pointer-events: none;
         z-index: -1;
     }
@@ -558,11 +569,19 @@ def main():
             # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
             planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
             
-            # Criar gráfico de pizza simples
+            # Criar gráfico de pizza com imagens dos planetas como padrões nas fatias
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
-                marker=dict(colors=planet_colors),
+                marker=dict(
+                    colors=planet_colors,
+                    pattern=dict(
+                        shape=["circle", "circle", "circle"],
+                        size=[30, 30, 30],
+                        solidity=0.7,
+                        fillmode="overlay"
+                    )
+                ),
                 textinfo='label+percent',
                 textfont_size=12,
                 hovertemplate='<b>%{label}</b><br>' +
@@ -570,6 +589,31 @@ def main():
                              'Percentual: %{percent}<br>' +
                              '<extra></extra>'
             )])
+            
+            # Adicionar imagens dos planetas como annotations sobrepostas nas fatias
+            fig_pie.add_annotation(
+                x=0.3, y=0.3,
+                xref="paper", yref="paper",
+                text=f"<img src='{planet_images['earth']}' width='60' height='60' style='border-radius: 50%; border: 3px solid #4169E1; box-shadow: 0 0 15px rgba(65, 105, 225, 0.8);'>",
+                showarrow=False,
+                font=dict(size=12)
+            )
+            
+            fig_pie.add_annotation(
+                x=0.7, y=0.3,
+                xref="paper", yref="paper", 
+                text=f"<img src='{planet_images['mars']}' width='60' height='60' style='border-radius: 50%; border: 3px solid #FF4500; box-shadow: 0 0 15px rgba(255, 69, 0, 0.8);'>",
+                showarrow=False,
+                font=dict(size=12)
+            )
+            
+            fig_pie.add_annotation(
+                x=0.5, y=0.1,
+                xref="paper", yref="paper",
+                text=f"<img src='{planet_images['neptune']}' width='60' height='60' style='border-radius: 50%; border: 3px solid #1E90FF; box-shadow: 0 0 15px rgba(30, 144, 255, 0.8);'>",
+                showarrow=False,
+                font=dict(size=12)
+            )
             
             fig_pie.update_layout(
                 height=350,
@@ -589,32 +633,6 @@ def main():
             
             # Renderizar gráfico
             st.plotly_chart(fig_pie, use_container_width=True)
-            
-            # Criar overlay com imagens dos planetas usando HTML/CSS
-            st.markdown(f"""
-            <div style="position: relative; margin-top: -200px; height: 0; z-index: 10;">
-                <div style="position: absolute; top: 50px; left: 25%; transform: translateX(-50%);">
-                    <img src="{planet_images['earth']}" width="50" height="50" style="border-radius: 50%; border: 3px solid #4169E1; box-shadow: 0 0 10px rgba(65, 105, 225, 0.5);">
-                </div>
-                <div style="position: absolute; top: 50px; right: 25%; transform: translateX(50%);">
-                    <img src="{planet_images['mars']}" width="50" height="50" style="border-radius: 50%; border: 3px solid #FF4500; box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);">
-                </div>
-                <div style="position: absolute; top: 150px; left: 50%; transform: translateX(-50%);">
-                    <img src="{planet_images['neptune']}" width="50" height="50" style="border-radius: 50%; border: 3px solid #1E90FF; box-shadow: 0 0 10px rgba(30, 144, 255, 0.5);">
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Mostrar imagens dos planetas selecionados
-            st.markdown(f"**{get_translation('representative_planets', selected_language)}:**")
-            col_earth, col_mars, col_neptune = st.columns(3)
-            
-            with col_earth:
-                st.image(planet_images['earth'], width=80, caption=get_translation("earth_confirmed", selected_language))
-            with col_mars:
-                st.image(planet_images['mars'], width=80, caption=get_translation("mars_candidates", selected_language))
-            with col_neptune:
-                st.image(planet_images['neptune'], width=80, caption=get_translation("neptune_false", selected_language))
     
     with tab2:
         st.header("Análise Manual")
