@@ -257,21 +257,9 @@ def initialize_detector():
 # CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fundo estrelado robusto */
+    /* Fundo estrelado aplicado diretamente */
     .stApp {
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%) !important;
-        background-attachment: fixed !important;
-        position: relative !important;
-    }
-    
-    .stApp::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-image: 
+        background: 
             radial-gradient(1px 1px at 20px 30px, white, transparent),
             radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
             radial-gradient(1px 1px at 90px 40px, white, transparent),
@@ -281,38 +269,21 @@ st.markdown("""
             radial-gradient(1px 1px at 250px 20px, white, transparent),
             radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.8), transparent),
             radial-gradient(1px 1px at 350px 60px, white, transparent),
-            radial-gradient(1px 1px at 400px 90px, rgba(255,255,255,0.7), transparent);
-        background-repeat: repeat;
-        background-size: 400px 300px;
-        animation: twinkle 4s ease-in-out infinite alternate;
-        pointer-events: none;
-        z-index: -999;
-    }
-    
-    .stApp::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-image: 
-            radial-gradient(1px 1px at 50px 50px, rgba(255,255,255,0.5), transparent),
-            radial-gradient(1px 1px at 100px 100px, rgba(255,255,255,0.3), transparent),
-            radial-gradient(1px 1px at 150px 150px, rgba(255,255,255,0.6), transparent),
-            radial-gradient(1px 1px at 200px 200px, rgba(255,255,255,0.4), transparent),
-            radial-gradient(1px 1px at 300px 100px, rgba(255,255,255,0.5), transparent),
-            radial-gradient(1px 1px at 400px 250px, rgba(255,255,255,0.3), transparent);
-        background-repeat: repeat;
-        background-size: 500px 400px;
-        animation: twinkle 6s ease-in-out infinite alternate reverse;
-        pointer-events: none;
-        z-index: -999;
+            radial-gradient(1px 1px at 400px 90px, rgba(255,255,255,0.7), transparent),
+            linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%) !important;
+        background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat !important;
+        background-size: 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 100% 100% !important;
+        background-attachment: fixed !important;
+        animation: twinkle 4s ease-in-out infinite alternate !important;
     }
     
     @keyframes twinkle {
-        0% { opacity: 0.2; }
-        100% { opacity: 1; }
+        0% { 
+            filter: brightness(0.3);
+        }
+        100% { 
+            filter: brightness(1);
+        }
     }
     
     .main-header {
