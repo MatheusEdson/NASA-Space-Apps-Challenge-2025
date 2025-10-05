@@ -31,53 +31,61 @@ def initialize_detector():
 # CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fundo estrelado animado */
-    body {
-        background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-        overflow-x: hidden;
+    /* Fundo estrelado animado - aplicado diretamente ao body */
+    .stApp {
+        background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%) !important;
+        background-attachment: fixed !important;
     }
     
-    .stars {
+    /* Estrelas fixas */
+    .stApp::before {
+        content: '';
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
+        background-image: 
+            radial-gradient(2px 2px at 20px 30px, white, transparent),
+            radial-gradient(2px 2px at 40px 70px, white, transparent),
+            radial-gradient(1px 1px at 90px 40px, white, transparent),
+            radial-gradient(1px 1px at 130px 80px, white, transparent),
+            radial-gradient(2px 2px at 160px 30px, white, transparent);
+        background-repeat: repeat;
+        background-size: 200px 100px;
+        animation: sparkle 3s linear infinite;
         pointer-events: none;
         z-index: -1;
     }
     
-    .star {
-        position: absolute;
-        background: white;
-        border-radius: 50%;
-        animation: twinkle 3s infinite;
+    @keyframes sparkle {
+        from { transform: translateY(0px); }
+        to { transform: translateY(-100px); }
     }
     
-    .star:nth-child(1) { top: 20%; left: 10%; width: 2px; height: 2px; animation-delay: 0s; }
-    .star:nth-child(2) { top: 30%; left: 20%; width: 1px; height: 1px; animation-delay: 0.5s; }
-    .star:nth-child(3) { top: 15%; left: 30%; width: 3px; height: 3px; animation-delay: 1s; }
-    .star:nth-child(4) { top: 40%; left: 15%; width: 1px; height: 1px; animation-delay: 1.5s; }
-    .star:nth-child(5) { top: 25%; left: 40%; width: 2px; height: 2px; animation-delay: 2s; }
-    .star:nth-child(6) { top: 35%; left: 50%; width: 1px; height: 1px; animation-delay: 2.5s; }
-    .star:nth-child(7) { top: 20%; left: 60%; width: 2px; height: 2px; animation-delay: 0.8s; }
-    .star:nth-child(8) { top: 45%; left: 70%; width: 1px; height: 1px; animation-delay: 1.3s; }
-    .star:nth-child(9) { top: 30%; left: 80%; width: 3px; height: 3px; animation-delay: 1.8s; }
-    .star:nth-child(10) { top: 15%; left: 90%; width: 1px; height: 1px; animation-delay: 2.3s; }
-    .star:nth-child(11) { top: 50%; left: 25%; width: 2px; height: 2px; animation-delay: 0.3s; }
-    .star:nth-child(12) { top: 60%; left: 45%; width: 1px; height: 1px; animation-delay: 0.7s; }
-    .star:nth-child(13) { top: 70%; left: 65%; width: 2px; height: 2px; animation-delay: 1.2s; }
-    .star:nth-child(14) { top: 80%; left: 35%; width: 1px; height: 1px; animation-delay: 1.7s; }
-    .star:nth-child(15) { top: 90%; left: 55%; width: 3px; height: 3px; animation-delay: 2.2s; }
-    
-    @keyframes twinkle {
-        0%, 100% { opacity: 0.3; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.2); }
+    /* Estrelas adicionais */
+    .stApp::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(1px 1px at 50px 50px, white, transparent),
+            radial-gradient(1px 1px at 100px 100px, white, transparent),
+            radial-gradient(1px 1px at 150px 150px, white, transparent),
+            radial-gradient(1px 1px at 200px 200px, white, transparent);
+        background-repeat: repeat;
+        background-size: 250px 250px;
+        animation: sparkle 4s linear infinite reverse;
+        pointer-events: none;
+        z-index: -1;
     }
     
     .main-header {
         font-size: 3rem;
-        color: #ffffff;
+        color: #ffffff !important;
         text-align: center;
         margin-bottom: 2rem;
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
@@ -88,60 +96,47 @@ st.markdown("""
     }
     
     .metric-card {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%) !important;
         padding: 1rem;
         border-radius: 10px;
         margin: 0.5rem;
-        color: white;
+        color: white !important;
         text-align: center;
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .status-running {
-        color: #00ff88;
+        color: #00ff88 !important;
         font-weight: bold;
         text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
     }
     
     .status-stopped {
-        color: #ff4444;
+        color: #ff4444 !important;
         font-weight: bold;
         text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
     }
     
     /* Transparência para elementos Streamlit */
     .stApp > header {
-        background-color: rgba(14, 17, 23, 0.8);
-    }
-    
-    .stApp {
-        background-color: transparent;
+        background-color: rgba(14, 17, 23, 0.8) !important;
     }
     
     .main .block-container {
-        background-color: rgba(14, 17, 23, 0.1);
+        background-color: rgba(14, 17, 23, 0.1) !important;
         backdrop-filter: blur(10px);
     }
+    
+    /* Forçar texto branco */
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {
+        color: white !important;
+    }
+    
+    .stApp p, .stApp div, .stApp span {
+        color: white !important;
+    }
 </style>
-
-<div class="stars">
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-</div>
 """, unsafe_allow_html=True)
 
 # Inicializar sistema
@@ -340,6 +335,7 @@ def main():
             # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
             planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
             
+            # Criar gráfico de pizza simples
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
@@ -368,7 +364,23 @@ def main():
                 )
             )
             
+            # Renderizar gráfico
             st.plotly_chart(fig_pie, use_container_width=True)
+            
+            # Criar overlay com imagens dos planetas usando HTML/CSS
+            st.markdown(f"""
+            <div style="position: relative; margin-top: -200px; height: 0; z-index: 10;">
+                <div style="position: absolute; top: 50px; left: 25%; transform: translateX(-50%);">
+                    <img src="{planet_images['earth']}" width="50" height="50" style="border-radius: 50%; border: 3px solid #4169E1; box-shadow: 0 0 10px rgba(65, 105, 225, 0.5);">
+                </div>
+                <div style="position: absolute; top: 50px; right: 25%; transform: translateX(50%);">
+                    <img src="{planet_images['mars']}" width="50" height="50" style="border-radius: 50%; border: 3px solid #FF4500; box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);">
+                </div>
+                <div style="position: absolute; top: 150px; left: 50%; transform: translateX(-50%);">
+                    <img src="{planet_images['neptune']}" width="50" height="50" style="border-radius: 50%; border: 3px solid #1E90FF; box-shadow: 0 0 10px rgba(30, 144, 255, 0.5);">
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
             # Mostrar imagens dos planetas selecionados
             st.markdown("**Planetas Representativos:**")
