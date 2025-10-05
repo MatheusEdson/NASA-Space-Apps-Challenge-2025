@@ -53,6 +53,13 @@ TRANSLATIONS = {
         'earth_confirmed': 'Terra - Confirmados',
         'mars_candidates': 'Marte - Candidatos',
         'neptune_false': 'Netuno - Falsos Positivos',
+        'update_data': 'Atualizar Dados',
+        'analyzing_transit': 'Analisando dados de trânsito...',
+        'calculating_probabilities': 'Calculando probabilidades...',
+        'running_ml_model': 'Executando modelo ML...',
+        'finalizing_results': 'Finalizando resultados...',
+        'analysis_complete': 'Análise concluída!',
+        'model_accuracy': 'Acurácia do Modelo',
         'manual_analysis': 'Análise Manual',
         'orbital_period': 'Período Orbital (dias)',
         'transit_depth': 'Profundidade do Trânsito',
@@ -61,6 +68,10 @@ TRANSLATIONS = {
         'equilibrium_temp': 'Temperatura de Equilíbrio (K)',
         'stellar_irradiation': 'Irradiação Estelar',
         'impact_parameter': 'Parâmetro de Impacto',
+        'stellar_mass': 'Massa Estelar (Solar)',
+        'stellar_radius': 'Raio Estelar (Solar)',
+        'stellar_density': 'Densidade Estelar (g/cm³)',
+        'kepmag': 'Magnitude Kepler',
         'analyze': 'Analisar',
         'prediction_result': 'Resultado da Predição',
         'confidence': 'Confiança',
@@ -239,7 +250,6 @@ st.set_page_config(
 
 # Obter idioma selecionado (será movido para sidebar)
 
-# Inicializar detector (exemplo)
 @st.cache_resource
 def initialize_detector():
     return ExoplanetDetector()
@@ -247,43 +257,38 @@ def initialize_detector():
 # CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fundo estrelado animado */
-    html, body {
-        background: #0a0a0a !important;
-        background-image: 
-            radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-            radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-            radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
-            radial-gradient(2px 2px at 160px 30px, #eee, transparent),
-            radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.4), transparent),
-            radial-gradient(2px 2px at 250px 20px, #fff, transparent),
-            radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.8), transparent);
-        background-repeat: repeat;
-        background-size: 300px 200px;
-        animation: sparkle 4s linear infinite;
-    }
-    
+    /* Fundo estrelado simples e eficaz */
     .stApp {
-        background: #0a0a0a !important;
+        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%) !important;
+        background-attachment: fixed !important;
+    }
+    
+    .stApp::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background-image: 
-            radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-            radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-            radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+            radial-gradient(1px 1px at 20px 30px, white, transparent),
+            radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 90px 40px, white, transparent),
             radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
-            radial-gradient(2px 2px at 160px 30px, #eee, transparent),
+            radial-gradient(1px 1px at 160px 30px, white, transparent),
             radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.4), transparent),
-            radial-gradient(2px 2px at 250px 20px, #fff, transparent),
+            radial-gradient(1px 1px at 250px 20px, white, transparent),
             radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.8), transparent);
         background-repeat: repeat;
         background-size: 300px 200px;
-        animation: sparkle 4s linear infinite;
+        animation: twinkle 3s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -1;
     }
     
-    @keyframes sparkle {
-        0% { transform: translateY(0px); opacity: 0.3; }
-        50% { opacity: 1; }
-        100% { transform: translateY(-200px); opacity: 0.3; }
+    @keyframes twinkle {
+        0% { opacity: 0.3; }
+        100% { opacity: 1; }
     }
     
     .main-header {
@@ -342,15 +347,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializar sistema
 @st.cache_resource
 def initialize_detector():
     return ExoplanetDetector()
 
-# Sistema de imagens planetárias aleatórias
-@st.cache_data(ttl=300)  # Cache por 5 minutos para manter consistência
+@st.cache_data(ttl=300)
 def get_random_planet_images():
-    """Retorna URLs de imagens de planetas aleatórias"""
     planet_images = {
         'earth': [
             'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/200px-The_Earth_seen_from_Apollo_17.jpg',
@@ -487,19 +489,19 @@ def main():
     with tab1:
         st.header(get_translation("real_time_analysis", selected_language))
         
-        # Auto-refresh
-        if st.button("Atualizar Dados") or system_status == "Ativo":
+        # Botão de atualização manual
+        if st.button(get_translation("update_data", selected_language)):
             # Simular atualização em tempo real
             for i in range(101):
                 progress_bar.progress(i)
                 if i < 50:
-                    status_text.text("Analisando dados de trânsito...")
+                    status_text.text(get_translation("analyzing_transit", selected_language))
                 elif i < 80:
-                    status_text.text("Calculando probabilidades...")
+                    status_text.text(get_translation("calculating_probabilities", selected_language))
                 elif i < 95:
-                    status_text.text("Executando modelo ML...")
+                    status_text.text(get_translation("running_ml_model", selected_language))
                 else:
-                    status_text.text("Análise concluída!")
+                    status_text.text(get_translation("analysis_complete", selected_language))
                 time.sleep(0.02)
             
             # Limpar interface
@@ -528,7 +530,7 @@ def main():
         
         with col_left:
             # Gráfico de acurácia ao longo do tempo
-            st.subheader("Acurácia do Modelo")
+            st.subheader(get_translation("model_accuracy", selected_language))
             
             # Simular dados históricos de acurácia
             timestamps = pd.date_range(end=datetime.now(), periods=50, freq='min')
@@ -611,26 +613,26 @@ def main():
                 st.image(planet_images['neptune'], width=80, caption=get_translation("neptune_false", selected_language))
     
     with tab2:
-        st.header("Análise Manual")
+        st.header(get_translation("manual_analysis", selected_language))
 
         col_p1, col_p2, col_p3 = st.columns(3)
 
         with col_p1:
-            orbital_period = st.number_input("Período Orbital (dias):", min_value=0.1, value=365.25)
-            transit_duration = st.number_input("Duração do Trânsito (horas):", min_value=0.1, value=8.0)
-            planet_radius = st.number_input("Raio Planetário (Terra):", min_value=0.1, value=1.0)
+            orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=365.25)
+            transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=8.0)
+            planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.0)
 
         with col_p2:
-            stellar_mass = st.number_input("Massa Estelar (Solar):", min_value=0.1, value=1.0)
-            stellar_radius = st.number_input("Raio Estelar (Solar):", min_value=0.1, value=1.0)
-            equilibrium_temp = st.number_input("Temperatura de Equilíbrio (K):", min_value=100.0, value=300.0)
+            stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0)
+            stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0)
+            equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=300.0)
 
         with col_p3:
-            impact_parameter = st.number_input("Parâmetro de Impacto:", min_value=0.0, max_value=1.0, value=0.5)
-            stellar_density = st.number_input("Densidade Estelar (g/cm³):", min_value=0.1, value=1.4)
-            kepmag = st.number_input("Magnitude Kepler:", min_value=8.0, max_value=16.0, value=12.0)
+            impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.5)
+            stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4)
+            kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0)
 
-        if st.button("Analisar Dados"):
+        if st.button(get_translation("analyze", selected_language)):
             input_data = [
             orbital_period, transit_duration, planet_radius,
             stellar_mass, stellar_radius, equilibrium_temp,
@@ -641,20 +643,20 @@ def main():
         pred_probs = np.random.uniform(0, 1, 3)
         pred_probs /= pred_probs.sum()
 
-        pred_labels = ['Confirmado', 'Candidato', 'Falso Positivo']
+        pred_labels = [get_translation("confirmed", selected_language), get_translation("candidate", selected_language), get_translation("false_positive", selected_language)]
 
-        st.subheader("Resultados da Análise")
+            st.subheader(get_translation("prediction_result", selected_language))
 
         col_r1, col_r2, col_r3 = st.columns(3)
 
         with col_r1:
-            st.metric("Confirmado", f"{pred_probs[0]:.2%}")
+            st.metric(get_translation("confirmed", selected_language), f"{pred_probs[0]:.2%}")
 
         with col_r2:
-            st.metric("Candidato", f"{pred_probs[1]:.2%}")
+            st.metric(get_translation("candidate", selected_language), f"{pred_probs[1]:.2%}")
 
         with col_r3:
-            st.metric("Falso Positivo", f"{pred_probs[2]:.2%}")
+            st.metric(get_translation("false_positive", selected_language), f"{pred_probs[2]:.2%}")
 
         fig_probs = go.Figure(data=[
             go.Bar(x=pred_labels, y=pred_probs, marker_color=['#2E8B57', '#FFA500', '#DC143C'])
@@ -669,7 +671,7 @@ def main():
         st.plotly_chart(fig_probs, use_container_width=True)
 
     with tab3:
-        st.header("Performance dos Modelos")
+        st.header(get_translation("model_performance", selected_language))
 
     # Simular dados de performance
         models = ['Random Forest', 'XGBoost', 'LightGBM']
@@ -711,7 +713,7 @@ def main():
         fig_comparison.add_trace(go.Bar(name='F1-Score', x=models, y=f1_score, marker_color='#f5576c'))
 
         fig_comparison.update_layout(
-        title="Comparação de Métricas por Modelo",
+        title=get_translation("model_comparison", selected_language),
         xaxis_title="Modelos",
         yaxis_title="Score",
         barmode='group',
