@@ -257,10 +257,11 @@ def initialize_detector():
 # CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fundo estrelado simples e eficaz */
+    /* Fundo estrelado robusto */
     .stApp {
-        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%) !important;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%) !important;
         background-attachment: fixed !important;
+        position: relative !important;
     }
     
     .stApp::before {
@@ -268,8 +269,8 @@ st.markdown("""
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background-image: 
             radial-gradient(1px 1px at 20px 30px, white, transparent),
             radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
@@ -278,16 +279,39 @@ st.markdown("""
             radial-gradient(1px 1px at 160px 30px, white, transparent),
             radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.4), transparent),
             radial-gradient(1px 1px at 250px 20px, white, transparent),
-            radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.8), transparent);
+            radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 350px 60px, white, transparent),
+            radial-gradient(1px 1px at 400px 90px, rgba(255,255,255,0.7), transparent);
         background-repeat: repeat;
-        background-size: 300px 200px;
-        animation: twinkle 3s ease-in-out infinite alternate;
+        background-size: 400px 300px;
+        animation: twinkle 4s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -1;
+    }
+    
+    .stApp::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: 
+            radial-gradient(1px 1px at 50px 50px, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1px 1px at 100px 100px, rgba(255,255,255,0.3), transparent),
+            radial-gradient(1px 1px at 150px 150px, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 200px 200px, rgba(255,255,255,0.4), transparent),
+            radial-gradient(1px 1px at 300px 100px, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1px 1px at 400px 250px, rgba(255,255,255,0.3), transparent);
+        background-repeat: repeat;
+        background-size: 500px 400px;
+        animation: twinkle 6s ease-in-out infinite alternate reverse;
         pointer-events: none;
         z-index: -1;
     }
     
     @keyframes twinkle {
-        0% { opacity: 0.3; }
+        0% { opacity: 0.2; }
         100% { opacity: 1; }
     }
     
@@ -569,11 +593,19 @@ def main():
             # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
             planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
             
-            # Criar gráfico de pizza simples sem annotations problemáticas
+            # Criar gráfico de pizza com imagens dos planetas integradas
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
-                marker=dict(colors=planet_colors),
+                marker=dict(
+                    colors=planet_colors,
+                    pattern=dict(
+                        shape=["circle", "circle", "circle"],
+                        size=[20, 20, 20],
+                        solidity=0.7,
+                        fillmode="overlay"
+                    )
+                ),
                 textinfo='label+percent',
                 textfont_size=12,
                 hovertemplate='<b>%{label}</b><br>' +
@@ -581,6 +613,31 @@ def main():
                              'Percentual: %{percent}<br>' +
                              '<extra></extra>'
             )])
+            
+            # Adicionar imagens dos planetas como annotations integradas nas fatias
+            fig_pie.add_annotation(
+                x=0.25, y=0.25,
+                xref="paper", yref="paper",
+                text=f"<img src='{planet_images['earth']}' width='50' height='50' style='border-radius: 50%; border: 2px solid #4169E1;'>",
+                showarrow=False,
+                font=dict(size=10)
+            )
+            
+            fig_pie.add_annotation(
+                x=0.75, y=0.25,
+                xref="paper", yref="paper", 
+                text=f"<img src='{planet_images['mars']}' width='50' height='50' style='border-radius: 50%; border: 2px solid #FF4500;'>",
+                showarrow=False,
+                font=dict(size=10)
+            )
+            
+            fig_pie.add_annotation(
+                x=0.5, y=0.1,
+                xref="paper", yref="paper",
+                text=f"<img src='{planet_images['neptune']}' width='50' height='50' style='border-radius: 50%; border: 2px solid #1E90FF;'>",
+                showarrow=False,
+                font=dict(size=10)
+            )
             
             fig_pie.update_layout(
                 height=350,
@@ -600,17 +657,95 @@ def main():
             
             # Renderizar gráfico
             st.plotly_chart(fig_pie, use_container_width=True)
-            
-            # Mostrar imagens dos planetas abaixo do gráfico
-            st.markdown(f"**{get_translation('representative_planets', selected_language)}:**")
-            col_earth, col_mars, col_neptune = st.columns(3)
-            
-            with col_earth:
-                st.image(planet_images['earth'], width=80, caption=get_translation("earth_confirmed", selected_language))
-            with col_mars:
-                st.image(planet_images['mars'], width=80, caption=get_translation("mars_candidates", selected_language))
-            with col_neptune:
-                st.image(planet_images['neptune'], width=80, caption=get_translation("neptune_false", selected_language))
+        
+        # Gráfico de Hyperparâmetros abaixo dos gráficos principais
+        st.markdown("---")
+        st.subheader("Otimização de Hyperparâmetros")
+        
+        # Simular dados de hyperparâmetros
+        np.random.seed(42)
+        n_samples = 100
+        x1 = np.random.uniform(0, 1, n_samples)
+        x2 = np.random.uniform(0, 1, n_samples)
+        
+        # Função objetivo simulada (múltiplos picos)
+        def objective_function(x1, x2):
+            return (np.sin(5 * x1) * np.cos(5 * x2) + 
+                    0.5 * np.sin(10 * x1) * np.cos(10 * x2) +
+                    0.3 * np.exp(-((x1-0.3)**2 + (x2-0.7)**2) / 0.1))
+        
+        z = objective_function(x1, x2)
+        
+        # Criar gráfico de contorno com pontos
+        fig_hyperparams = go.Figure()
+        
+        # Adicionar contornos
+        x_grid = np.linspace(0, 1, 50)
+        y_grid = np.linspace(0, 1, 50)
+        X, Y = np.meshgrid(x_grid, y_grid)
+        Z = objective_function(X, Y)
+        
+        fig_hyperparams.add_trace(go.Contour(
+            x=x_grid,
+            y=y_grid,
+            z=Z,
+            colorscale='RdYlBu',
+            showscale=True,
+            opacity=0.7,
+            name='Função Objetivo'
+        ))
+        
+        # Adicionar pontos de amostragem
+        fig_hyperparams.add_trace(go.Scatter(
+            x=x1,
+            y=x2,
+            mode='markers',
+            marker=dict(
+                size=8,
+                color='black',
+                symbol='x',
+                line=dict(width=2, color='white')
+            ),
+            name='Amostras',
+            hovertemplate='<b>Amostra</b><br>' +
+                         'x1: %{x:.3f}<br>' +
+                         'x2: %{y:.3f}<br>' +
+                         'Valor: %{customdata:.3f}<br>' +
+                         '<extra></extra>',
+            customdata=z
+        ))
+        
+        # Adicionar rug plots nas bordas
+        fig_hyperparams.add_trace(go.Scatter(
+            x=x1,
+            y=[1.05] * len(x1),
+            mode='markers',
+            marker=dict(size=3, color='green', symbol='line-ns'),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
+        
+        fig_hyperparams.add_trace(go.Scatter(
+            x=[1.05] * len(x2),
+            y=x2,
+            mode='markers',
+            marker=dict(size=3, color='green', symbol='line-ew'),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
+        
+        fig_hyperparams.update_layout(
+            title='Landscape de Hyperparâmetros - Otimização de Modelos',
+            xaxis_title='Parâmetro x1',
+            yaxis_title='Parâmetro x2',
+            width=800,
+            height=600,
+            xaxis=dict(range=[-0.1, 1.1]),
+            yaxis=dict(range=[-0.1, 1.1]),
+            showlegend=True
+        )
+        
+        st.plotly_chart(fig_hyperparams, use_container_width=True)
     
     with tab2:
         st.header(get_translation("manual_analysis", selected_language))
