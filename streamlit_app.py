@@ -274,16 +274,6 @@ st.markdown("""
         background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat !important;
         background-size: 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 100% 100% !important;
         background-attachment: fixed !important;
-        animation: twinkle 4s ease-in-out infinite alternate !important;
-    }
-    
-    @keyframes twinkle {
-        0% { 
-            filter: brightness(0.3);
-        }
-        100% { 
-            filter: brightness(1);
-        }
     }
     
     .main-header {
@@ -568,15 +558,7 @@ def main():
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
-                marker=dict(
-                    colors=planet_colors,
-                    pattern=dict(
-                        shape=["circle", "circle", "circle"],
-                        size=[20, 20, 20],
-                        solidity=0.7,
-                        fillmode="overlay"
-                    )
-                ),
+                marker=dict(colors=planet_colors),
                 textinfo='label+percent',
                 textfont_size=12,
                 hovertemplate='<b>%{label}</b><br>' +
