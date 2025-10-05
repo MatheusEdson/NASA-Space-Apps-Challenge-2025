@@ -15,6 +15,220 @@ from datetime import datetime, timedelta
 # Importar nosso sistema ML
 from exoplanet_ml import ExoplanetDetector
 
+# Sistema de tradução
+TRANSLATIONS = {
+    'pt': {
+        'page_title': 'Detecção de Exoplanetas com IA',
+        'main_header': 'Sistema de Detecção de Exoplanetas com IA',
+        'dashboard': 'Dashboard',
+        'analysis': 'Análise',
+        'performance': 'Performance',
+        'documentation': 'Documentação',
+        'system_controls': 'Controles do Sistema',
+        'system_status': 'Status do Sistema',
+        'active': 'Ativo',
+        'paused': 'Pausado',
+        'active_model': 'Modelo Ativo',
+        'choose_model': 'Escolha o modelo:',
+        'settings': 'Configurações',
+        'update_interval': 'Intervalo de atualização (segundos):',
+        'confidence_threshold': 'Limiar de confiança:',
+        'data_upload': 'Upload de Dados',
+        'standard_spreadsheet': 'Planilha Padrão:',
+        'download_template': 'Baixar Template CSV',
+        'template_help': 'Use este template como base para seus dados',
+        'load_dataset': 'Carregar dataset:',
+        'file_loaded': 'Arquivo carregado:',
+        'real_time_analysis': 'Análise em Tempo Real',
+        'objects_analyzed': 'Objetos Analizados',
+        'confirmed_exoplanets': 'Exoplanetas Confirmados',
+        'candidates': 'Candidatos',
+        'false_positives': 'Falsos Positivos',
+        'accuracy_evolution': 'Evolução da Acurácia',
+        'time': 'Tempo',
+        'accuracy': 'Acurácia',
+        'planetary_distribution': 'Distribuição Planetária',
+        'exoplanet_classification': 'Classificação de Exoplanetas',
+        'representative_planets': 'Planetas Representativos',
+        'earth_confirmed': 'Terra - Confirmados',
+        'mars_candidates': 'Marte - Candidatos',
+        'neptune_false': 'Netuno - Falsos Positivos',
+        'manual_analysis': 'Análise Manual',
+        'orbital_period': 'Período Orbital (dias)',
+        'transit_depth': 'Profundidade do Trânsito',
+        'transit_duration': 'Duração do Trânsito (horas)',
+        'planet_radius': 'Raio Planetário (R⊕)',
+        'equilibrium_temp': 'Temperatura de Equilíbrio (K)',
+        'stellar_irradiation': 'Irradiação Estelar',
+        'impact_parameter': 'Parâmetro de Impacto',
+        'analyze': 'Analisar',
+        'prediction_result': 'Resultado da Predição',
+        'confidence': 'Confiança',
+        'model_performance': 'Performance dos Modelos',
+        'model_comparison': 'Comparação de Modelos',
+        'documentation_resources': 'Documentação e Recursos',
+        'about_system': 'Sobre o Sistema',
+        'methodology': 'Metodologia',
+        'analysis_variables': 'Variáveis de Análise',
+        'spreadsheet_format': 'Formato da Planilha Padrão',
+        'required_columns': 'Colunas Obrigatórias:',
+        'classifications': 'Classificações',
+        'confirmed': 'Confirmado',
+        'candidate': 'Candidato',
+        'false_positive': 'Falso Positivo',
+        'technical_resources': 'Recursos Técnicos',
+        'tip': 'Dica:',
+        'use_template_button': 'Use o botão "Baixar Template CSV" na sidebar para obter um exemplo completo!'
+    },
+    'en': {
+        'page_title': 'Exoplanet Detection with AI',
+        'main_header': 'Exoplanet Detection System with AI',
+        'dashboard': 'Dashboard',
+        'analysis': 'Analysis',
+        'performance': 'Performance',
+        'documentation': 'Documentation',
+        'system_controls': 'System Controls',
+        'system_status': 'System Status',
+        'active': 'Active',
+        'paused': 'Paused',
+        'active_model': 'Active Model',
+        'choose_model': 'Choose model:',
+        'settings': 'Settings',
+        'update_interval': 'Update interval (seconds):',
+        'confidence_threshold': 'Confidence threshold:',
+        'data_upload': 'Data Upload',
+        'standard_spreadsheet': 'Standard Spreadsheet:',
+        'download_template': 'Download Template CSV',
+        'template_help': 'Use this template as a base for your data',
+        'load_dataset': 'Load dataset:',
+        'file_loaded': 'File loaded:',
+        'real_time_analysis': 'Real-time Analysis',
+        'objects_analyzed': 'Objects Analyzed',
+        'confirmed_exoplanets': 'Confirmed Exoplanets',
+        'candidates': 'Candidates',
+        'false_positives': 'False Positives',
+        'accuracy_evolution': 'Accuracy Evolution',
+        'time': 'Time',
+        'accuracy': 'Accuracy',
+        'planetary_distribution': 'Planetary Distribution',
+        'exoplanet_classification': 'Exoplanet Classification',
+        'representative_planets': 'Representative Planets',
+        'earth_confirmed': 'Earth - Confirmed',
+        'mars_candidates': 'Mars - Candidates',
+        'neptune_false': 'Neptune - False Positives',
+        'manual_analysis': 'Manual Analysis',
+        'orbital_period': 'Orbital Period (days)',
+        'transit_depth': 'Transit Depth',
+        'transit_duration': 'Transit Duration (hours)',
+        'planet_radius': 'Planet Radius (R⊕)',
+        'equilibrium_temp': 'Equilibrium Temperature (K)',
+        'stellar_irradiation': 'Stellar Irradiation',
+        'impact_parameter': 'Impact Parameter',
+        'analyze': 'Analyze',
+        'prediction_result': 'Prediction Result',
+        'confidence': 'Confidence',
+        'model_performance': 'Model Performance',
+        'model_comparison': 'Model Comparison',
+        'documentation_resources': 'Documentation and Resources',
+        'about_system': 'About the System',
+        'methodology': 'Methodology',
+        'analysis_variables': 'Analysis Variables',
+        'spreadsheet_format': 'Standard Spreadsheet Format',
+        'required_columns': 'Required Columns:',
+        'classifications': 'Classifications',
+        'confirmed': 'Confirmed',
+        'candidate': 'Candidate',
+        'false_positive': 'False Positive',
+        'technical_resources': 'Technical Resources',
+        'tip': 'Tip:',
+        'use_template_button': 'Use the "Download Template CSV" button in the sidebar to get a complete example!'
+    },
+    'es': {
+        'page_title': 'Detección de Exoplanetas con IA',
+        'main_header': 'Sistema de Detección de Exoplanetas con IA',
+        'dashboard': 'Panel',
+        'analysis': 'Análisis',
+        'performance': 'Rendimiento',
+        'documentation': 'Documentación',
+        'system_controls': 'Controles del Sistema',
+        'system_status': 'Estado del Sistema',
+        'active': 'Activo',
+        'paused': 'Pausado',
+        'active_model': 'Modelo Activo',
+        'choose_model': 'Elige el modelo:',
+        'settings': 'Configuración',
+        'update_interval': 'Intervalo de actualización (segundos):',
+        'confidence_threshold': 'Umbral de confianza:',
+        'data_upload': 'Carga de Datos',
+        'standard_spreadsheet': 'Hoja de Cálculo Estándar:',
+        'download_template': 'Descargar Plantilla CSV',
+        'template_help': 'Usa esta plantilla como base para tus datos',
+        'load_dataset': 'Cargar dataset:',
+        'file_loaded': 'Archivo cargado:',
+        'real_time_analysis': 'Análisis en Tiempo Real',
+        'objects_analyzed': 'Objetos Analizados',
+        'confirmed_exoplanets': 'Exoplanetas Confirmados',
+        'candidates': 'Candidatos',
+        'false_positives': 'Falsos Positivos',
+        'accuracy_evolution': 'Evolución de la Precisión',
+        'time': 'Tiempo',
+        'accuracy': 'Precisión',
+        'planetary_distribution': 'Distribución Planetaria',
+        'exoplanet_classification': 'Clasificación de Exoplanetas',
+        'representative_planets': 'Planetas Representativos',
+        'earth_confirmed': 'Tierra - Confirmados',
+        'mars_candidates': 'Marte - Candidatos',
+        'neptune_false': 'Neptuno - Falsos Positivos',
+        'manual_analysis': 'Análisis Manual',
+        'orbital_period': 'Período Orbital (días)',
+        'transit_depth': 'Profundidad del Tránsito',
+        'transit_duration': 'Duración del Tránsito (horas)',
+        'planet_radius': 'Radio Planetario (R⊕)',
+        'equilibrium_temp': 'Temperatura de Equilibrio (K)',
+        'stellar_irradiation': 'Irradiación Estelar',
+        'impact_parameter': 'Parámetro de Impacto',
+        'analyze': 'Analizar',
+        'prediction_result': 'Resultado de la Predicción',
+        'confidence': 'Confianza',
+        'model_performance': 'Rendimiento del Modelo',
+        'model_comparison': 'Comparación de Modelos',
+        'documentation_resources': 'Documentación y Recursos',
+        'about_system': 'Acerca del Sistema',
+        'methodology': 'Metodología',
+        'analysis_variables': 'Variables de Análisis',
+        'spreadsheet_format': 'Formato de Hoja de Cálculo Estándar',
+        'required_columns': 'Columnas Requeridas:',
+        'classifications': 'Clasificaciones',
+        'confirmed': 'Confirmado',
+        'candidate': 'Candidato',
+        'false_positive': 'Falso Positivo',
+        'technical_resources': 'Recursos Técnicos',
+        'tip': 'Consejo:',
+        'use_template_button': '¡Usa el botón "Descargar Plantilla CSV" en la barra lateral para obtener un ejemplo completo!'
+    }
+}
+
+def get_translation(key, lang='pt'):
+    """Retorna a tradução para a chave especificada"""
+    return TRANSLATIONS.get(lang, TRANSLATIONS['pt']).get(key, key)
+
+def get_language_selector():
+    """Cria o seletor de idioma"""
+    languages = {
+        '🇧🇷 Português': 'pt',
+        '🇺🇸 English': 'en', 
+        '🇪🇸 Español': 'es'
+    }
+    
+    selected_lang = st.selectbox(
+        "Idioma / Language / Idioma:",
+        options=list(languages.keys()),
+        index=0,
+        key="language_selector"
+    )
+    
+    return languages[selected_lang]
+
 # Configurar página
 st.set_page_config(
     page_title="Detecção de Exoplanetas com IA",
@@ -22,6 +236,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Obter idioma selecionado (será movido para sidebar)
 
 # Inicializar detector (exemplo)
 @st.cache_resource
@@ -195,65 +411,72 @@ def get_real_time_data():
     return data
 
 def main():
+    # Obter idioma selecionado
+    selected_language = get_language_selector()
 
     # Header principal
-    st.markdown('<h1 class="main-header">Sistema de Detecção de Exoplanetas com IA</h1>', unsafe_allow_html=True)
+    st.markdown(f'<h1 class="main-header">{get_translation("main_header", selected_language)}</h1>', unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
-        st.header("Controles do Sistema")
+        st.header(get_translation("system_controls", selected_language))
         
         # Status do sistema
-        st.subheader("Status do Sistema")
-        system_status = st.radio("Status:", ["Ativo", "Pausado"], key="status")
+        st.subheader(get_translation("system_status", selected_language))
+        system_status = st.radio("Status:", [get_translation("active", selected_language), get_translation("paused", selected_language)], key="status")
         
-        if system_status == "Ativo":
+        if system_status == get_translation("active", selected_language):
             st.markdown('<p class="status-running">● Sistema ATIVO</p>', unsafe_allow_html=True)
         else:
             st.markdown('<p class="status-stopped">● Sistema PAUSADO</p>', unsafe_allow_html=True)
         
         # Seleção de modelo
-        st.subheader("Modelo Ativo")
+        st.subheader(get_translation("active_model", selected_language))
         model_option = st.selectbox(
-            "Escolha o modelo:",
+            get_translation("choose_model", selected_language),
             ["Random Forest", "XGBoost", "LightGBM", "Ensemble"]
         )
         
         # Configurações
-        st.subheader("Configurações")
-        update_interval = st.slider("Intervalo de atualização (segundos):", 1, 30, 5)
-        confidence_threshold = st.slider("Limiar de confiança:", 0.0, 1.0, 0.8)
+        st.subheader(get_translation("settings", selected_language))
+        update_interval = st.slider(get_translation("update_interval", selected_language), 1, 30, 5)
+        confidence_threshold = st.slider(get_translation("confidence_threshold", selected_language), 0.0, 1.0, 0.8)
         
         # Upload de dados
-        st.subheader("Upload de Dados")
+        st.subheader(get_translation("data_upload", selected_language))
         
         # Download da planilha padrão
-        st.markdown("**Planilha Padrão:**")
+        st.markdown(f"**{get_translation('standard_spreadsheet', selected_language)}**")
         with open('exoplanet_template.csv', 'r') as f:
             csv_content = f.read()
         
         st.download_button(
-            label="Baixar Template CSV",
+            label=get_translation("download_template", selected_language),
             data=csv_content,
             file_name="exoplanet_template.csv",
             mime="text/csv",
-            help="Use este template como base para seus dados"
+            help=get_translation("template_help", selected_language)
         )
         
-        uploaded_file = st.file_uploader("Carregar dataset:", type=['csv', 'xlsx'])
+        uploaded_file = st.file_uploader(get_translation("load_dataset", selected_language), type=['csv', 'xlsx'])
         
         if uploaded_file:
-            st.success(f"Arquivo carregado: {uploaded_file.name}")
+            st.success(f"{get_translation('file_loaded', selected_language)} {uploaded_file.name}")
     
     # Layout principal com tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Dashboard", "Análise", "Performance", "Documentação"])
+    tab1, tab2, tab3, tab4 = st.tabs([
+        get_translation("dashboard", selected_language), 
+        get_translation("analysis", selected_language), 
+        get_translation("performance", selected_language), 
+        get_translation("documentation", selected_language)
+    ])
     
     # Barra de progresso da análise atual
     progress_bar = st.progress(0)
     status_text = st.empty()
     
     with tab1:
-        st.header("Dashboard em Tempo Real")
+        st.header(get_translation("real_time_analysis", selected_language))
         
         # Auto-refresh
         if st.button("Atualizar Dados") or system_status == "Ativo":
@@ -280,16 +503,16 @@ def main():
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("Objetos Analisados", f"{real_time_data['objects_analyzed']:,}")
+            st.metric(get_translation("objects_analyzed", selected_language), f"{real_time_data['objects_analyzed']:,}")
         
         with col2:
-            st.metric("Confirmados", f"{real_time_data['confirmed_exoplanets']}", "+5")
+            st.metric(get_translation("confirmed_exoplanets", selected_language), f"{real_time_data['confirmed_exoplanets']}", "+5")
         
         with col3:
-            st.metric("Candidatos", f"{real_time_data['candidates']}", "+12")
+            st.metric(get_translation("candidates", selected_language), f"{real_time_data['candidates']}", "+12")
         
         with col4:
-            st.metric("Falsos Positivos", f"{real_time_data['false_positives']}", "-3")
+            st.metric(get_translation("false_positives", selected_language), f"{real_time_data['false_positives']}", "-3")
         
         # Gráficos em tempo real
         col_left, col_right = st.columns(2)
@@ -312,9 +535,9 @@ def main():
             ))
             
             fig_accuracy.update_layout(
-                title="Evolução da Acurácia",
-                xaxis_title="Tempo",
-                yaxis_title="Acurácia",
+                title=get_translation("accuracy_evolution", selected_language),
+                xaxis_title=get_translation("time", selected_language),
+                yaxis_title=get_translation("accuracy", selected_language),
                 height=300
             )
             
@@ -322,9 +545,9 @@ def main():
         
         with col_right:
             # Distribuição das classificações
-            st.subheader("Distribuição Planetária")
+            st.subheader(get_translation("planetary_distribution", selected_language))
             
-            labels = ['Confirmados', 'Candidatos', 'Falsos Positivos']
+            labels = [get_translation("confirmed", selected_language), get_translation("candidate", selected_language), get_translation("false_positive", selected_language)]
             values = [real_time_data['confirmed_exoplanets'], 
                      real_time_data['candidates'], 
                      real_time_data['false_positives']]
@@ -359,7 +582,7 @@ def main():
                     x=1.01
                 ),
                 title=dict(
-                    text="Classificação de Exoplanetas",
+                    text=get_translation("exoplanet_classification", selected_language),
                     font=dict(size=16, color='#2E8B57')
                 )
             )
@@ -383,15 +606,15 @@ def main():
             """, unsafe_allow_html=True)
             
             # Mostrar imagens dos planetas selecionados
-            st.markdown("**Planetas Representativos:**")
+            st.markdown(f"**{get_translation('representative_planets', selected_language)}:**")
             col_earth, col_mars, col_neptune = st.columns(3)
             
             with col_earth:
-                st.image(planet_images['earth'], width=80, caption="Terra - Confirmados")
+                st.image(planet_images['earth'], width=80, caption=get_translation("earth_confirmed", selected_language))
             with col_mars:
-                st.image(planet_images['mars'], width=80, caption="Marte - Candidatos")
+                st.image(planet_images['mars'], width=80, caption=get_translation("mars_candidates", selected_language))
             with col_neptune:
-                st.image(planet_images['neptune'], width=80, caption="Netuno - Falsos Positivos")
+                st.image(planet_images['neptune'], width=80, caption=get_translation("neptune_false", selected_language))
     
     with tab2:
         st.header("Análise Manual")
