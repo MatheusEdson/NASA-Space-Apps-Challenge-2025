@@ -569,19 +569,11 @@ def main():
             # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
             planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
             
-            # Criar gráfico de pizza com imagens dos planetas como padrões nas fatias
+            # Criar gráfico de pizza com imagens dos planetas como annotations
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
-                marker=dict(
-                    colors=planet_colors,
-                    pattern=dict(
-                        shape=["circle", "circle", "circle"],
-                        size=[30, 30, 30],
-                        solidity=0.7,
-                        fillmode="overlay"
-                    )
-                ),
+                marker=dict(colors=planet_colors),
                 textinfo='label+percent',
                 textfont_size=12,
                 hovertemplate='<b>%{label}</b><br>' +
