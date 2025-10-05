@@ -286,7 +286,7 @@ st.markdown("""
         background-size: 400px 300px;
         animation: twinkle 4s ease-in-out infinite alternate;
         pointer-events: none;
-        z-index: -1;
+        z-index: -999;
     }
     
     .stApp::after {
@@ -307,7 +307,7 @@ st.markdown("""
         background-size: 500px 400px;
         animation: twinkle 6s ease-in-out infinite alternate reverse;
         pointer-events: none;
-        z-index: -1;
+        z-index: -999;
     }
     
     @keyframes twinkle {
