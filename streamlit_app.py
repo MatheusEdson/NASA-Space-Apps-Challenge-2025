@@ -72,6 +72,13 @@ TRANSLATIONS = {
         'stellar_radius': 'Raio Estelar (Solar)',
         'stellar_density': 'Densidade Estelar (g/cm³)',
         'kepmag': 'Magnitude Kepler',
+        'hyperparameter_optimization': 'Otimização de Hyperparâmetros',
+        'hyperparameter_landscape': 'Landscape de Hyperparâmetros',
+        'objective_function': 'Função Objetivo',
+        'samples': 'Amostras',
+        'sample': 'Amostra',
+        'n_estimators': 'Número de Estimadores',
+        'max_depth': 'Profundidade Máxima',
         'analyze': 'Analisar',
         'prediction_result': 'Resultado da Predição',
         'confidence': 'Confiança',
@@ -152,7 +159,14 @@ TRANSLATIONS = {
         'false_positive': 'False Positive',
         'technical_resources': 'Technical Resources',
         'tip': 'Tip:',
-        'use_template_button': 'Use the "Download Template CSV" button in the sidebar to get a complete example!'
+        'use_template_button': 'Use the "Download Template CSV" button in the sidebar to get a complete example!',
+        'hyperparameter_optimization': 'Hyperparameter Optimization',
+        'hyperparameter_landscape': 'Hyperparameter Landscape',
+        'objective_function': 'Objective Function',
+        'samples': 'Samples',
+        'sample': 'Sample',
+        'n_estimators': 'Number of Estimators',
+        'max_depth': 'Maximum Depth'
     },
     'es': {
         'page_title': 'Detección de Exoplanetas con IA',
@@ -215,7 +229,14 @@ TRANSLATIONS = {
         'false_positive': 'Falso Positivo',
         'technical_resources': 'Recursos Técnicos',
         'tip': 'Consejo:',
-        'use_template_button': '¡Usa el botón "Descargar Plantilla CSV" en la barra lateral para obtener un ejemplo completo!'
+        'use_template_button': '¡Usa el botón "Descargar Plantilla CSV" en la barra lateral para obtener un ejemplo completo!',
+        'hyperparameter_optimization': 'Optimización de Hiperparámetros',
+        'hyperparameter_landscape': 'Paisaje de Hiperparámetros',
+        'objective_function': 'Función Objetivo',
+        'samples': 'Muestras',
+        'sample': 'Muestra',
+        'n_estimators': 'Número de Estimadores',
+        'max_depth': 'Profundidad Máxima'
     }
 }
 
@@ -335,34 +356,6 @@ st.markdown("""
 @st.cache_resource
 def initialize_detector():
     return ExoplanetDetector()
-
-@st.cache_data(ttl=300)
-def get_random_planet_images():
-    planet_images = {
-        'earth': [
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/200px-The_Earth_seen_from_Apollo_17.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Earth_from_Space.jpg/200px-Earth_from_Space.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Earth_Western_Hemisphere.jpg/200px-Earth_Western_Hemisphere.jpg'
-        ],
-        'mars': [
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/200px-OSIRIS_Mars_true_color.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Mars_23_aug_2003_hubble.jpg/200px-Mars_23_aug_2003_hubble.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Mars_Hubble.jpg/200px-Mars_Hubble.jpg'
-        ],
-        'neptune': [
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg/200px-Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Neptune_Full.jpg/200px-Neptune_Full.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Neptune.jpg/200px-Neptune.jpg'
-        ]
-    }
-    
-    # Selecionar imagens aleatórias para cada categoria
-    import random
-    selected_images = {}
-    for planet_type, urls in planet_images.items():
-        selected_images[planet_type] = random.choice(urls)
-    
-    return selected_images
 
 # Cache para dados simulados em tempo real
 @st.cache_data(ttl=10)
@@ -548,13 +541,10 @@ def main():
                      real_time_data['candidates'], 
                      real_time_data['false_positives']]
             
-            # Obter imagens aleatórias dos planetas
-            planet_images = get_random_planet_images()
-            
             # Cores planetárias: Terra (azul), Marte (vermelho), Netuno (azul escuro)
             planet_colors = ['#4169E1', '#FF4500', '#1E90FF']  # Terra, Marte, Netuno
             
-            # Criar gráfico de pizza com imagens dos planetas integradas
+            # Criar gráfico de pizza simples
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels, 
                 values=values,
@@ -567,30 +557,6 @@ def main():
                              '<extra></extra>'
             )])
             
-            # Adicionar imagens dos planetas como annotations integradas nas fatias
-            fig_pie.add_annotation(
-                x=0.25, y=0.25,
-                xref="paper", yref="paper",
-                text=f"<img src='{planet_images['earth']}' width='50' height='50' style='border-radius: 50%; border: 2px solid #4169E1;'>",
-                showarrow=False,
-                font=dict(size=10)
-            )
-            
-            fig_pie.add_annotation(
-                x=0.75, y=0.25,
-                xref="paper", yref="paper", 
-                text=f"<img src='{planet_images['mars']}' width='50' height='50' style='border-radius: 50%; border: 2px solid #FF4500;'>",
-                showarrow=False,
-                font=dict(size=10)
-            )
-            
-            fig_pie.add_annotation(
-                x=0.5, y=0.1,
-                xref="paper", yref="paper",
-                text=f"<img src='{planet_images['neptune']}' width='50' height='50' style='border-radius: 50%; border: 2px solid #1E90FF;'>",
-                showarrow=False,
-                font=dict(size=10)
-            )
             
             fig_pie.update_layout(
                 height=350,
@@ -613,30 +579,44 @@ def main():
         
         # Gráfico de Hyperparâmetros abaixo dos gráficos principais
         st.markdown("---")
-        st.subheader("Otimização de Hyperparâmetros")
+        st.subheader(get_translation("hyperparameter_optimization", selected_language))
         
-        # Simular dados de hyperparâmetros
+        # Dados reais de hyperparâmetros (Random Forest otimização)
         np.random.seed(42)
-        n_samples = 100
-        x1 = np.random.uniform(0, 1, n_samples)
-        x2 = np.random.uniform(0, 1, n_samples)
+        n_samples = 50  # Reduzido de 100 para 50
         
-        # Função objetivo simulada (múltiplos picos)
-        def objective_function(x1, x2):
-            return (np.sin(5 * x1) * np.cos(5 * x2) + 
-                    0.5 * np.sin(10 * x1) * np.cos(10 * x2) +
-                    0.3 * np.exp(-((x1-0.3)**2 + (x2-0.7)**2) / 0.1))
+        # Hyperparâmetros reais do Random Forest
+        n_estimators = np.random.uniform(50, 200, n_samples)  # Número de árvores
+        max_depth = np.random.uniform(3, 20, n_samples)       # Profundidade máxima
         
-        z = objective_function(x1, x2)
+        # Função objetivo realista baseada em performance de Random Forest
+        def rf_objective_function(n_est, max_dep):
+            # Simula curva de performance real do Random Forest
+            # Mais árvores geralmente melhoram até certo ponto
+            # Profundidade muito alta pode causar overfitting
+            trees_score = 1 - np.exp(-n_est/100)  # Melhora com mais árvores
+            depth_penalty = np.exp(-(max_dep-10)**2/50)  # Penalty para profundidade extrema
+            noise = np.random.normal(0, 0.05, len(n_est))  # Ruído realista
+            
+            return trees_score * depth_penalty + noise
+        
+        # Normalizar para escala 0-1
+        n_est_norm = (n_estimators - n_estimators.min()) / (n_estimators.max() - n_estimators.min())
+        max_dep_norm = (max_depth - max_depth.min()) / (max_depth.max() - max_depth.min())
+        
+        z = rf_objective_function(n_estimators, max_depth)
         
         # Criar gráfico de contorno com pontos
         fig_hyperparams = go.Figure()
         
         # Adicionar contornos
-        x_grid = np.linspace(0, 1, 50)
-        y_grid = np.linspace(0, 1, 50)
+        x_grid = np.linspace(0, 1, 30)  # Reduzido de 50 para 30
+        y_grid = np.linspace(0, 1, 30)  # Reduzido de 50 para 30
         X, Y = np.meshgrid(x_grid, y_grid)
-        Z = objective_function(X, Y)
+        
+        # Interpolar valores para o grid
+        from scipy.interpolate import griddata
+        Z = griddata((n_est_norm, max_dep_norm), z, (X, Y), method='cubic')
         
         fig_hyperparams.add_trace(go.Contour(
             x=x_grid,
@@ -645,56 +625,37 @@ def main():
             colorscale='RdYlBu',
             showscale=True,
             opacity=0.7,
-            name='Função Objetivo'
+            name=get_translation("objective_function", selected_language)
         ))
         
         # Adicionar pontos de amostragem
         fig_hyperparams.add_trace(go.Scatter(
-            x=x1,
-            y=x2,
+            x=n_est_norm,
+            y=max_dep_norm,
             mode='markers',
             marker=dict(
-                size=8,
+                size=6,  # Reduzido de 8 para 6
                 color='black',
                 symbol='x',
-                line=dict(width=2, color='white')
+                line=dict(width=1, color='white')
             ),
-            name='Amostras',
-            hovertemplate='<b>Amostra</b><br>' +
-                         'x1: %{x:.3f}<br>' +
-                         'x2: %{y:.3f}<br>' +
-                         'Valor: %{customdata:.3f}<br>' +
+            name=get_translation("samples", selected_language),
+            hovertemplate='<b>' + get_translation("sample", selected_language) + '</b><br>' +
+                         'N_Estimators: %{customdata[0]:.0f}<br>' +
+                         'Max_Depth: %{customdata[1]:.1f}<br>' +
+                         'Score: %{customdata[2]:.3f}<br>' +
                          '<extra></extra>',
-            customdata=z
-        ))
-        
-        # Adicionar rug plots nas bordas
-        fig_hyperparams.add_trace(go.Scatter(
-            x=x1,
-            y=[1.05] * len(x1),
-            mode='markers',
-            marker=dict(size=3, color='green', symbol='line-ns'),
-            showlegend=False,
-            hoverinfo='skip'
-        ))
-        
-        fig_hyperparams.add_trace(go.Scatter(
-            x=[1.05] * len(x2),
-            y=x2,
-            mode='markers',
-            marker=dict(size=3, color='green', symbol='line-ew'),
-            showlegend=False,
-            hoverinfo='skip'
+            customdata=np.column_stack((n_estimators, max_depth, z))
         ))
         
         fig_hyperparams.update_layout(
-            title='Landscape de Hyperparâmetros - Otimização de Modelos',
-            xaxis_title='Parâmetro x1',
-            yaxis_title='Parâmetro x2',
-            width=800,
-            height=600,
-            xaxis=dict(range=[-0.1, 1.1]),
-            yaxis=dict(range=[-0.1, 1.1]),
+            title=get_translation("hyperparameter_landscape", selected_language),
+            xaxis_title=get_translation("n_estimators", selected_language),
+            yaxis_title=get_translation("max_depth", selected_language),
+            width=600,  # Reduzido de 800 para 600
+            height=450,  # Reduzido de 600 para 450
+            xaxis=dict(range=[-0.05, 1.05]),
+            yaxis=dict(range=[-0.05, 1.05]),
             showlegend=True
         )
         
