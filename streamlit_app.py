@@ -346,26 +346,10 @@ def clear_all_data():
     if 'confirm_reset' in st.session_state:
         del st.session_state['confirm_reset']
     
-    # Limpar cache do navegador usando JavaScript
-    st.markdown("""
-    <script>
-    // Limpar localStorage
-    localStorage.clear();
-    
-    // Limpar sessionStorage
-    sessionStorage.clear();
-    
-    // Limpar cookies relacionados ao Streamlit
-    document.cookie.split(";").forEach(function(c) { 
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-    });
-    
-    // Forçar reload da página para limpar cache
-    setTimeout(function() {
-        window.location.reload();
-    }, 1000);
-    </script>
-    """, unsafe_allow_html=True)
+    # Limpar outros estados relacionados
+    keys_to_clear = [key for key in st.session_state.keys() if key.startswith('upload') or key.startswith('analysis')]
+    for key in keys_to_clear:
+        del st.session_state[key]
     
     return True
 
@@ -571,14 +555,17 @@ def main():
                 st.warning(get_translation("reset_confirmation", selected_language))
         
         if st.session_state.get('confirm_reset', False):
-            if st.button(get_translation("confirm", selected_language), type="primary"):
-                clear_all_data()
-                st.success(get_translation("data_cleared", selected_language))
-                st.session_state['confirm_reset'] = False
-                st.rerun()
-            if st.button(get_translation("cancel", selected_language)):
-                st.session_state['confirm_reset'] = False
-                st.rerun()
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button(get_translation("confirm", selected_language), type="primary"):
+                    clear_all_data()
+                    st.success(get_translation("data_cleared", selected_language))
+                    st.session_state['confirm_reset'] = False
+                    st.rerun()
+            with col2:
+                if st.button(get_translation("cancel", selected_language)):
+                    st.session_state['confirm_reset'] = False
+                    st.rerun()
         
         # Upload de dados
         st.subheader(get_translation("data_upload", selected_language))
@@ -1007,9 +994,11 @@ def main():
         - [Kepler Mission](https://www.nasa.gov/mission_pages/kepler/main/)
         - [TESS Mission](https://tess.mit.edu/)
         - [K2 Mission](https://keplerscience.arc.nasa.gov/k2/)
+        - [Repositório GitHub](https://github.com/MatheusEdson/NASA-Space-Apps-Challenge-2025)
         """)
         
         st.subheader(f"📖 {get_translation('source_code', selected_language)}")
+        st.markdown("**🔗 [Repositório GitHub](https://github.com/MatheusEdson/NASA-Space-Apps-Challenge-2025)**")
         st.code("""
 # Example: Executar sistema completo
 from exoplanet_ml import ExoplanetDetector
@@ -1029,3 +1018,12 @@ print(f"Classificação: {prediction['ensemble_prediction']}")
 
 if __name__ == "__main__":
     main()
+    
+    # Rodapé com link do repositório
+    st.markdown("---")
+    st.markdown("""
+    <div style='text-align: center; color: #666; padding: 20px;'>
+        <p>🚀 <strong>Sistema de Detecção de Exoplanetas com IA</strong> | NASA Space Apps Challenge 2025</p>
+        <p>📂 <a href='https://github.com/MatheusEdson/NASA-Space-Apps-Challenge-2025' target='_blank' style='color: #667eea;'>Repositório GitHub</a></p>
+    </div>
+    """, unsafe_allow_html=True)
