@@ -119,7 +119,6 @@ TRANSLATIONS = {
         'analysis_variables': 'Variáveis de Análise',
         'spreadsheet_format': 'Formato da Planilha Padrão',
         'required_columns': 'Colunas Obrigatórias:',
-        'classifications': 'Classificações',
         'confirmed': 'Confirmado',
         'candidate': 'Candidato',
         'false_positive': 'Falso Positivo',
@@ -226,6 +225,7 @@ TRANSLATIONS = {
         'required_columns': 'Required Columns',
         'tip': 'Tip',
         'classifications': 'Classifications',
+    },
     'es': {
         'page_title': 'Detección de Exoplanetas con IA',
         'main_header': 'Sistema de Detección de Exoplanetas con IA',
@@ -325,6 +325,7 @@ TRANSLATIONS = {
         'required_columns': 'Columnas Requeridas',
         'tip': 'Consejo',
         'classifications': 'Clasificaciones',
+    }
 }
 
 def get_translation(key, lang='pt'):
