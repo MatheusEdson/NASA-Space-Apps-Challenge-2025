@@ -425,45 +425,50 @@ def safe_read_file(uploaded_file, selected_language):
 def validate_dataframe(df, selected_language):
     """Valida se o DataFrame tem as colunas necessárias"""
     try:
-        # Colunas obrigatórias (flexível - aceita variações)
-        required_columns = {
-            'koi_name': ['koi_name', 'name', 'object_name', 'planet_name', 'pl_name'],
-            'koi_period': ['koi_period', 'period', 'orbital_period', 'pl_orbper'],
-            'koi_depth': ['koi_depth', 'depth', 'transit_depth', 'pl_trandep'],
-            'koi_duration': ['koi_duration', 'duration', 'transit_duration', 'pl_trandur'],
-            'koi_prad': ['koi_prad', 'prad', 'planet_radius', 'pl_rade', 'pl_radj'],
-            'koi_teq': ['koi_teq', 'teq', 'equilibrium_temperature', 'pl_eqt'],
-            'koi_insol': ['koi_insol', 'insol', 'stellar_irradiance', 'pl_insol'],
-            'koi_impact': ['koi_impact', 'impact', 'impact_parameter', 'pl_imppar'],
-            'koi_disposition': ['koi_disposition', 'disposition', 'classification', 'pl_status']
-        }
+        # Detectar tipo de arquivo baseado nas colunas
+        is_microlensing = 'pl_name' in df.columns and 'ml_' in ' '.join(df.columns)
+        is_kepler = 'koi_name' in df.columns or 'koi_period' in df.columns
+        is_tess = 'toi_name' in df.columns or 'tic_id' in df.columns
         
-        # Verificar se encontramos pelo menos algumas colunas essenciais
-        found_columns = {}
-        df_columns_lower = [col.lower().strip() for col in df.columns]
+        if is_microlensing:
+            # Validação específica para Microlensing
+            microlensing_columns = ['pl_name', 'pl_massj', 'pl_masse', 'ml_radsnorm', 'ml_xtimeein']
+            found_microlensing = sum(1 for col in microlensing_columns if col in df.columns)
+            
+            if found_microlensing >= 2:
+                return True, f"✅ Arquivo Microlensing válido! Encontradas {found_microlensing} colunas específicas."
+            else:
+                return False, f"Arquivo Microlensing incompleto. Encontradas apenas {found_microlensing} colunas específicas."
         
-        for required_key, possible_names in required_columns.items():
-            for possible_name in possible_names:
-                if possible_name.lower() in df_columns_lower:
-                    found_columns[required_key] = possible_name
-                    break
+        elif is_kepler:
+            # Validação para Kepler/KOI
+            kepler_columns = ['koi_name', 'koi_period', 'koi_depth', 'koi_prad']
+            found_kepler = sum(1 for col in kepler_columns if col in df.columns)
+            
+            if found_kepler >= 2:
+                return True, f"✅ Arquivo Kepler válido! Encontradas {found_kepler} colunas específicas."
+            else:
+                return False, f"Arquivo Kepler incompleto. Encontradas apenas {found_kepler} colunas específicas."
         
-        # Verificar se temos pelo menos algumas colunas essenciais
-        essential_columns = ['koi_name', 'koi_period', 'koi_depth', 'koi_prad']
-        found_essential = sum(1 for col in essential_columns if col in found_columns)
+        elif is_tess:
+            # Validação para TESS
+            tess_columns = ['toi_name', 'tic_id', 'period', 'depth']
+            found_tess = sum(1 for col in tess_columns if col in df.columns)
+            
+            if found_tess >= 2:
+                return True, f"✅ Arquivo TESS válido! Encontradas {found_tess} colunas específicas."
+            else:
+                return False, f"Arquivo TESS incompleto. Encontradas apenas {found_tess} colunas específicas."
         
-        if found_essential < 2:
-            return False, f"Apenas {found_essential} colunas essenciais encontradas. Necessário pelo menos 2."
-        
-        # Verificar se há dados válidos
-        numeric_columns = ['koi_period', 'koi_depth', 'koi_prad']
-        for col in numeric_columns:
-            if col in found_columns:
-                col_name = found_columns[col]
-                if not pd.api.types.is_numeric_dtype(df[col_name]):
-                    return False, f"Coluna '{col_name}' deve conter valores numéricos."
-        
-        return True, f"Dados válidos! Encontradas {found_essential} colunas essenciais."
+        else:
+            # Validação genérica
+            generic_columns = ['name', 'period', 'depth', 'radius']
+            found_generic = sum(1 for col in generic_columns if col in df.columns)
+            
+            if found_generic >= 2:
+                return True, f"✅ Arquivo genérico válido! Encontradas {found_generic} colunas essenciais."
+            else:
+                return False, f"Arquivo não reconhecido. Encontradas apenas {found_generic} colunas essenciais."
         
     except Exception as e:
         return False, f"Erro na validação: {str(e)}"
