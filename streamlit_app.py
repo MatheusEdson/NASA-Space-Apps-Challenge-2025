@@ -497,22 +497,18 @@ def get_real_time_data():
     if 'real_time_data' in st.session_state:
         return st.session_state['real_time_data']
     
-    current_time = datetime.now()
-    
-    # Simular dados de análise em tempo real
+    # Se não há dados na sessão, retornar dados zerados
     data = {
-        'timestamp': current_time,
-        'objects_analyzed': np.random.randint(1000, 1500),
-        'confirmed_exoplanets': np.random.randint(80, 120),
-        'candidates': np.random.randint(200, 300),
-        'false_positives': np.random.randint(150, 250),
-        'accuracy': np.random.uniform(0.85, 0.95),
-        'processing_time': np.random.uniform(0.5, 3.0),
-        'model_active': np.random.choice(['Random Forest', 'XGBoost', 'LightGBM'])
+        'timestamp': datetime.now(),
+        'objects_analyzed': 0,
+        'confirmed_exoplanets': 0,
+        'candidates': 0,
+        'false_positives': 0,
+        'accuracy': 0.0,
+        'processing_time': 0.0,
+        'model_active': 'Nenhum'
     }
     
-    # Salvar na sessão para poder ser limpo
-    st.session_state['real_time_data'] = data
     return data
 
 def main():
@@ -695,9 +691,24 @@ def main():
                     status_text.text(get_translation("analysis_complete", selected_language))
                 time.sleep(0.02)
             
+            # Gerar novos dados simulados
+            current_time = datetime.now()
+            data = {
+                'timestamp': current_time,
+                'objects_analyzed': np.random.randint(1000, 1500),
+                'confirmed_exoplanets': np.random.randint(80, 120),
+                'candidates': np.random.randint(200, 300),
+                'false_positives': np.random.randint(150, 250),
+                'accuracy': np.random.uniform(0.85, 0.95),
+                'processing_time': np.random.uniform(0.5, 3.0),
+                'model_active': np.random.choice(['Random Forest', 'XGBoost', 'LightGBM'])
+            }
+            st.session_state['real_time_data'] = data
+            
             # Limpar interface
             progress_bar.empty()
             status_text.empty()
+            st.rerun()
         
         # Métricas em tempo real
         real_time_data = get_real_time_data()
