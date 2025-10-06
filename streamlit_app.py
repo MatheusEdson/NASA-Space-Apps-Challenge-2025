@@ -895,10 +895,12 @@ def main():
         st.header(get_translation("documentation", selected_language))
         
         st.subheader(get_translation("about_system", selected_language))
-        st.markdown(f"""
+        st.markdown("""
         Este sistema utiliza **Inteligência Artificial** para identificar e classificar exoplanetas 
         usando dados das missões Kepler, K2 e TESS da NASA.
+        """)
         
+        st.markdown(f"""
         ### 🔬 {get_translation("methodology", selected_language)}
         
         **1. {get_translation("data_preprocessing", selected_language)}**
@@ -911,7 +913,9 @@ def main():
         - **XGBoost**: {get_translation("xgboost_desc", selected_language)}
         - **LightGBM**: {get_translation("lightgbm_desc", selected_language)}
         - **Ensemble**: Combinação para máxima robustez
+        """)
         
+        st.markdown("""
         ### Variáveis de Análise
         
         - **Período Orbital**: Duração da órbita do planeta
@@ -936,8 +940,9 @@ def main():
         ```
         
         **Dica:** Use o botão "Baixar Template CSV" na sidebar para obter um exemplo completo!
+        """)
         
-        
+        st.markdown("""
         ### Classificações
         
         - **Confirmado**: Planeta validado por múltiplas observações
