@@ -1056,11 +1056,21 @@ def main():
             adapted_data = st.session_state['adapted_data']
             analysis_results = st.session_state['analysis_results']
             
+            # Verificar se há dados filtrados na sessão
+            if 'filtered_data' in st.session_state and len(st.session_state['filtered_data']) > 0:
+                # Usar dados filtrados se disponíveis
+                display_data = st.session_state['filtered_data']
+                st.success("📊 **Dados Filtrados Ativos** - Dashboard atualizado com filtros aplicados")
+            else:
+                # Usar todos os dados se não há filtros
+                display_data = adapted_data
+                st.success("📊 **Dados Reais da Análise** - Dashboard atualizado com dados carregados")
+            
             # Calcular métricas reais
-            total_objects = len(adapted_data)
-            confirmed_count = len(adapted_data[adapted_data['koi_disposition'] == 'CONFIRMED'])
-            candidate_count = len(adapted_data[adapted_data['koi_disposition'] == 'CANDIDATE'])
-            false_positive_count = len(adapted_data[adapted_data['koi_disposition'] == 'FALSE POSITIVE'])
+            total_objects = len(display_data)
+            confirmed_count = len(display_data[display_data['koi_disposition'] == 'CONFIRMED'])
+            candidate_count = len(display_data[display_data['koi_disposition'] == 'CANDIDATE'])
+            false_positive_count = len(display_data[display_data['koi_disposition'] == 'FALSE POSITIVE'])
             
             # Calcular acurácia média dos modelos
             if isinstance(analysis_results, dict):
@@ -1083,11 +1093,7 @@ def main():
             # Usar dados simulados se não há análise real
             real_time_data = get_real_time_data()
         
-        # Indicador de status dos dados
-        if 'analysis_results' in st.session_state and 'adapted_data' in st.session_state:
-            st.success("📊 **Dados Reais da Análise** - Dashboard atualizado com dados carregados")
-        else:
-            st.info("📈 **Dados Simulados** - Faça upload de dados para ver análise real")
+        # Indicador de status dos dados (removido - já está acima)
         
         col1, col2, col3, col4 = st.columns(4)
         
@@ -1378,8 +1384,25 @@ def main():
                 (adapted_data['koi_disposition'].isin(disposition_filter))
             ]
             
+            # Salvar dados filtrados na sessão para usar no dashboard
+            st.session_state['filtered_data'] = filtered_data
+            
             # Mostrar resultados dos filtros
             st.subheader("📈 Resultados dos Filtros")
+            
+            # Botão para limpar filtros
+            col_clear, col_info = st.columns([1, 3])
+            with col_clear:
+                if st.button("🔄 Limpar Filtros", type="secondary"):
+                    if 'filtered_data' in st.session_state:
+                        del st.session_state['filtered_data']
+                    st.rerun()
+            
+            with col_info:
+                if 'filtered_data' in st.session_state and len(st.session_state['filtered_data']) > 0:
+                    st.info("💡 **Filtros ativos** - Dashboard será atualizado automaticamente")
+                else:
+                    st.info("📊 **Todos os dados** - Nenhum filtro aplicado")
             
             col_r1, col_r2, col_r3, col_r4 = st.columns(4)
             
@@ -1471,32 +1494,9 @@ def main():
                 with col_res3:
                     st.metric("Falso Positivo", f"{pred_probs[2]:.1%}")
 
-        pred_labels = [get_translation("confirmed", selected_language), get_translation("candidate", selected_language), get_translation("false_positive", selected_language)]
+        # Remover código duplicado que estava causando erro
 
-        st.subheader(get_translation("prediction_result", selected_language))
-
-        col_r1, col_r2, col_r3 = st.columns(3)
-
-        with col_r1:
-            st.metric(get_translation("confirmed", selected_language), f"{pred_probs[0]:.2%}")
-
-        with col_r2:
-            st.metric(get_translation("candidate", selected_language), f"{pred_probs[1]:.2%}")
-
-        with col_r3:
-            st.metric(get_translation("false_positive", selected_language), f"{pred_probs[2]:.2%}")
-
-        fig_probs = go.Figure(data=[
-            go.Bar(x=pred_labels, y=pred_probs, marker_color=['#2E8B57', '#FFA500', '#DC143C'])
-        ])
-
-        fig_probs.update_layout(
-            title="Probabilidades de Classificação",
-            yaxis_title="Probabilidade",
-            height=400
-        )
-
-        st.plotly_chart(fig_probs, use_container_width=True)
+        # Remover código duplicado que estava causando erro
 
     with tab3:
         st.header(get_translation("model_performance", selected_language))
