@@ -419,7 +419,7 @@ def initialize_detector():
 # CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fundo estrelado aplicado diretamente */
+    /* Fundo estrelado simplificado */
     .stApp {
         background: 
             radial-gradient(1px 1px at 20px 30px, white, transparent),
@@ -427,14 +427,9 @@ st.markdown("""
             radial-gradient(1px 1px at 90px 40px, white, transparent),
             radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
             radial-gradient(1px 1px at 160px 30px, white, transparent),
-            radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.4), transparent),
-            radial-gradient(1px 1px at 250px 20px, white, transparent),
-            radial-gradient(1px 1px at 300px 80px, rgba(255,255,255,0.8), transparent),
-            radial-gradient(1px 1px at 350px 60px, white, transparent),
-            radial-gradient(1px 1px at 400px 90px, rgba(255,255,255,0.7), transparent),
             linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%) !important;
-        background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat !important;
-        background-size: 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 400px 300px, 100% 100% !important;
+        background-repeat: repeat, repeat, repeat, repeat, repeat, no-repeat !important;
+        background-size: 200px 150px, 200px 150px, 200px 150px, 200px 150px, 200px 150px, 100% 100% !important;
         background-attachment: fixed !important;
     }
     
@@ -443,11 +438,8 @@ st.markdown("""
         color: #ffffff !important;
         text-align: center;
         margin-bottom: 2rem;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     .metric-card {
