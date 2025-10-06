@@ -992,43 +992,63 @@ def main():
     with tab1:
         st.header(get_translation("real_time_analysis", selected_language))
         
-        # Botão para buscar dados das bases NASA
-        if st.button("🔍 Buscar Dados das Bases NASA", type="primary"):
-            # Simular busca nas bases NASA
-            for i in range(101):
-                progress_bar.progress(i)
-                if i < 20:
-                    status_text.text("🔍 Conectando com NASA Exoplanet Archive...")
-                elif i < 40:
-                    status_text.text("📡 Baixando dados Kepler...")
-                elif i < 60:
-                    status_text.text("🛰️ Processando dados TESS...")
-                elif i < 80:
-                    status_text.text("🌌 Analisando dados Microlensing...")
-                elif i < 95:
-                    status_text.text("🤖 Executando modelos ML...")
+        # Botões de controle
+        col_btn1, col_btn2 = st.columns(2)
+        
+        with col_btn1:
+            # Botão para buscar dados das bases NASA
+            if st.button("🔍 Buscar Dados das Bases NASA", type="primary"):
+                # Simular busca nas bases NASA
+                for i in range(101):
+                    progress_bar.progress(i)
+                    if i < 20:
+                        status_text.text("🔍 Conectando com NASA Exoplanet Archive...")
+                    elif i < 40:
+                        status_text.text("📡 Baixando dados Kepler...")
+                    elif i < 60:
+                        status_text.text("🛰️ Processando dados TESS...")
+                    elif i < 80:
+                        status_text.text("🌌 Analisando dados Microlensing...")
+                    elif i < 95:
+                        status_text.text("🤖 Executando modelos ML...")
+                    else:
+                        status_text.text("✅ Dados atualizados com sucesso!")
+                    time.sleep(0.03)
+                
+                # Gerar novos dados simulados baseados em dados NASA
+                current_time = datetime.now()
+                data = {
+                    'timestamp': current_time,
+                    'objects_analyzed': np.random.randint(1200, 1800),
+                    'confirmed_exoplanets': np.random.randint(90, 150),
+                    'candidates': np.random.randint(250, 350),
+                    'false_positives': np.random.randint(180, 280),
+                    'accuracy': np.random.uniform(0.88, 0.96),
+                    'processing_time': np.random.uniform(1.5, 4.0),
+                    'model_active': np.random.choice(['Random Forest', 'XGBoost', 'LightGBM'])
+                }
+                st.session_state['real_time_data'] = data
+                
+                # Limpar interface
+                progress_bar.empty()
+                status_text.empty()
+                st.rerun()
+        
+        with col_btn2:
+            # Botão para limpar dados
+            if st.button("🗑️ Limpar Dados", type="secondary"):
+                if st.session_state.get('confirm_reset', False):
+                    clear_all_data()
+                    st.success("✅ Dados limpos com sucesso!")
+                    st.session_state['confirm_reset'] = False
+                    st.rerun()
                 else:
-                    status_text.text("✅ Dados atualizados com sucesso!")
-                time.sleep(0.03)
-            
-            # Gerar novos dados simulados baseados em dados NASA
-            current_time = datetime.now()
-            data = {
-                'timestamp': current_time,
-                'objects_analyzed': np.random.randint(1200, 1800),
-                'confirmed_exoplanets': np.random.randint(90, 150),
-                'candidates': np.random.randint(250, 350),
-                'false_positives': np.random.randint(180, 280),
-                'accuracy': np.random.uniform(0.88, 0.96),
-                'processing_time': np.random.uniform(1.5, 4.0),
-                'model_active': np.random.choice(['Random Forest', 'XGBoost', 'LightGBM'])
-            }
-            st.session_state['real_time_data'] = data
-            
-            # Limpar interface
-            progress_bar.empty()
-            status_text.empty()
-            st.rerun()
+                    st.session_state['confirm_reset'] = True
+                    st.warning("⚠️ Clique novamente para confirmar a limpeza dos dados")
+        
+        # Confirmação de limpeza
+        if st.session_state.get('confirm_reset', False):
+            st.info("⚠️ **Confirmação necessária:** Clique em 'Limpar Dados' novamente para confirmar")
         
         # Métricas em tempo real - usar dados reais se disponíveis
         if 'analysis_results' in st.session_state and 'adapted_data' in st.session_state:
@@ -1274,16 +1294,182 @@ def main():
             stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4)
             kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0)
 
-        if st.button(get_translation("analyze", selected_language)):
-            input_data = [
-            orbital_period, transit_duration, planet_radius,
-            stellar_mass, stellar_radius, equilibrium_temp,
-            impact_parameter, stellar_density, kepmag
-        ]
+    with tab2:
+        st.header(get_translation("manual_analysis", selected_language))
+        
+        # Verificar se há dados carregados
+        if 'adapted_data' in st.session_state:
+            adapted_data = st.session_state['adapted_data']
+            
+            st.success(f"📊 **Dados carregados:** {len(adapted_data)} objetos disponíveis para análise")
+            
+            # Filtros para análise
+            st.subheader("🔍 Filtros de Análise")
+            
+            col_f1, col_f2, col_f3 = st.columns(3)
+            
+            with col_f1:
+                # Filtro por período orbital
+                period_range = st.slider(
+                    "Período Orbital (dias)",
+                    min_value=float(adapted_data['koi_period'].min()),
+                    max_value=float(adapted_data['koi_period'].max()),
+                    value=(float(adapted_data['koi_period'].min()), float(adapted_data['koi_period'].max())),
+                    step=0.1
+                )
+                
+                # Filtro por raio planetário
+                radius_range = st.slider(
+                    "Raio Planetário (R⊕)",
+                    min_value=float(adapted_data['koi_prad'].min()),
+                    max_value=float(adapted_data['koi_prad'].max()),
+                    value=(float(adapted_data['koi_prad'].min()), float(adapted_data['koi_prad'].max())),
+                    step=0.1
+                )
+            
+            with col_f2:
+                # Filtro por temperatura
+                temp_range = st.slider(
+                    "Temperatura de Equilíbrio (K)",
+                    min_value=float(adapted_data['koi_teq'].min()),
+                    max_value=float(adapted_data['koi_teq'].max()),
+                    value=(float(adapted_data['koi_teq'].min()), float(adapted_data['koi_teq'].max())),
+                    step=10.0
+                )
+                
+                # Filtro por profundidade do trânsito
+                depth_range = st.slider(
+                    "Profundidade do Trânsito",
+                    min_value=float(adapted_data['koi_depth'].min()),
+                    max_value=float(adapted_data['koi_depth'].max()),
+                    value=(float(adapted_data['koi_depth'].min()), float(adapted_data['koi_depth'].max())),
+                    step=0.0001
+                )
+            
+            with col_f3:
+                # Filtro por classificação
+                disposition_filter = st.multiselect(
+                    "Classificação",
+                    options=['CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE'],
+                    default=['CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE']
+                )
+                
+                # Filtro por duração do trânsito
+                duration_range = st.slider(
+                    "Duração do Trânsito (horas)",
+                    min_value=float(adapted_data['koi_duration'].min()),
+                    max_value=float(adapted_data['koi_duration'].max()),
+                    value=(float(adapted_data['koi_duration'].min()), float(adapted_data['koi_duration'].max())),
+                    step=0.1
+                )
+            
+            # Aplicar filtros
+            filtered_data = adapted_data[
+                (adapted_data['koi_period'] >= period_range[0]) & 
+                (adapted_data['koi_period'] <= period_range[1]) &
+                (adapted_data['koi_prad'] >= radius_range[0]) & 
+                (adapted_data['koi_prad'] <= radius_range[1]) &
+                (adapted_data['koi_teq'] >= temp_range[0]) & 
+                (adapted_data['koi_teq'] <= temp_range[1]) &
+                (adapted_data['koi_depth'] >= depth_range[0]) & 
+                (adapted_data['koi_depth'] <= depth_range[1]) &
+                (adapted_data['koi_duration'] >= duration_range[0]) & 
+                (adapted_data['koi_duration'] <= duration_range[1]) &
+                (adapted_data['koi_disposition'].isin(disposition_filter))
+            ]
+            
+            # Mostrar resultados dos filtros
+            st.subheader("📈 Resultados dos Filtros")
+            
+            col_r1, col_r2, col_r3, col_r4 = st.columns(4)
+            
+            with col_r1:
+                st.metric("Objetos Filtrados", len(filtered_data))
+            
+            with col_r2:
+                confirmed_filtered = len(filtered_data[filtered_data['koi_disposition'] == 'CONFIRMED'])
+                st.metric("Confirmados", confirmed_filtered)
+            
+            with col_r3:
+                candidates_filtered = len(filtered_data[filtered_data['koi_disposition'] == 'CANDIDATE'])
+                st.metric("Candidatos", candidates_filtered)
+            
+            with col_r4:
+                false_positives_filtered = len(filtered_data[filtered_data['koi_disposition'] == 'FALSE POSITIVE'])
+                st.metric("Falsos Positivos", false_positives_filtered)
+            
+            # Mostrar dados filtrados
+            if len(filtered_data) > 0:
+                st.subheader("📋 Dados Filtrados")
+                st.dataframe(filtered_data[['koi_name', 'koi_period', 'koi_prad', 'koi_teq', 'koi_disposition']].head(20))
+                
+                # Estatísticas dos dados filtrados
+                st.subheader("📊 Estatísticas dos Dados Filtrados")
+                
+                col_s1, col_s2 = st.columns(2)
+                
+                with col_s1:
+                    st.write("**Período Orbital:**")
+                    st.write(f"- Média: {filtered_data['koi_period'].mean():.2f} dias")
+                    st.write(f"- Mediana: {filtered_data['koi_period'].median():.2f} dias")
+                    st.write(f"- Desvio Padrão: {filtered_data['koi_period'].std():.2f} dias")
+                    
+                    st.write("**Raio Planetário:**")
+                    st.write(f"- Média: {filtered_data['koi_prad'].mean():.2f} R⊕")
+                    st.write(f"- Mediana: {filtered_data['koi_prad'].median():.2f} R⊕")
+                
+                with col_s2:
+                    st.write("**Temperatura:**")
+                    st.write(f"- Média: {filtered_data['koi_teq'].mean():.1f} K")
+                    st.write(f"- Mediana: {filtered_data['koi_teq'].median():.1f} K")
+                    st.write(f"- Desvio Padrão: {filtered_data['koi_teq'].std():.1f} K")
+                    
+                    st.write("**Profundidade do Trânsito:**")
+                    st.write(f"- Média: {filtered_data['koi_depth'].mean():.6f}")
+                    st.write(f"- Mediana: {filtered_data['koi_depth'].median():.6f}")
+            else:
+                st.warning("⚠️ Nenhum objeto encontrado com os filtros aplicados")
+        
+        else:
+            st.info("📁 **Nenhum dado carregado** - Faça upload de um arquivo na aba 'Análise' para usar os filtros")
+            
+            # Interface de análise manual (modo sem dados)
+            st.subheader("🔬 Análise Manual")
+            
+            col_p1, col_p2, col_p3 = st.columns(3)
 
-        # Simulação das probabilidades para exemplo:
-        pred_probs = np.random.uniform(0, 1, 3)
-        pred_probs /= pred_probs.sum()
+            with col_p1:
+                orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=365.25)
+                transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=8.0)
+                planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.0)
+
+            with col_p2:
+                stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0)
+                stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0)
+                equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=300.0)
+
+            with col_p3:
+                impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.5)
+                stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4)
+                kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0)
+
+            if st.button(get_translation("analyze", selected_language)):
+                st.info("🔬 **Modo de análise manual** - Para análise completa, faça upload de dados na aba 'Análise'")
+                
+                # Simulação das probabilidades para exemplo:
+                pred_probs = np.random.uniform(0, 1, 3)
+                pred_probs /= pred_probs.sum()
+                
+                st.subheader("📊 Resultados da Análise Manual")
+                
+                col_res1, col_res2, col_res3 = st.columns(3)
+                
+                with col_res1:
+                    st.metric("Confirmado", f"{pred_probs[0]:.1%}")
+                with col_res2:
+                    st.metric("Candidato", f"{pred_probs[1]:.1%}")
+                with col_res3:
+                    st.metric("Falso Positivo", f"{pred_probs[2]:.1%}")
 
         pred_labels = [get_translation("confirmed", selected_language), get_translation("candidate", selected_language), get_translation("false_positive", selected_language)]
 
