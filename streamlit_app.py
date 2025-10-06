@@ -278,8 +278,8 @@ def clear_all_data():
     
     return True
 
-def get_language_selector(context='sidebar'):
-    """Cria o seletor de idioma com chave única baseada no contexto"""
+def get_language_selector():
+    """Cria o seletor de idioma"""
     languages = {
         '🇧🇷 Português': 'pt',
         '🇺🇸 English': 'en', 
@@ -290,7 +290,7 @@ def get_language_selector(context='sidebar'):
         "Idioma / Language / Idioma:",
         options=list(languages.keys()),
         index=0,
-        key=f"language_selector_{context}"
+        key="language_selector"
     )
     
     return languages[selected_lang]
@@ -523,8 +523,6 @@ def main():
     status_text = st.empty()
     
     with tab1:
-        # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector('dashboard')
         st.header(get_translation("real_time_analysis", selected_language))
         
         # Botão de atualização manual
@@ -736,8 +734,6 @@ def main():
         st.plotly_chart(fig_hyperparams, use_container_width=True)
     
     with tab2:
-        # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector('analysis')
         st.header(get_translation("manual_analysis", selected_language))
 
         col_p1, col_p2, col_p3 = st.columns(3)
@@ -796,8 +792,6 @@ def main():
         st.plotly_chart(fig_probs, use_container_width=True)
 
     with tab3:
-        # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector('performance')
         st.header(get_translation("model_performance", selected_language))
 
     # Simular dados de performance
@@ -850,8 +844,6 @@ def main():
         st.plotly_chart(fig_comparison, use_container_width=True)
     
     with tab4:
-        # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector('documentation')
         st.header(get_translation("documentation", selected_language))
         
         st.subheader("Sobre o Sistema")
