@@ -101,7 +101,14 @@ TRANSLATIONS = {
         'precision_label': 'Precisão',
         'recall_label': 'Recall',
         'f1_score_label': 'F1-Score',
-        'analyze': 'Analisar',
+        'external_resources': 'Recursos Externos',
+        'source_code': 'Código Fonte',
+        'technical_resources': 'Recursos Técnicos',
+        'analysis_variables': 'Variáveis de Análise',
+        'spreadsheet_format': 'Formato da Planilha Padrão',
+        'required_columns': 'Colunas Obrigatórias',
+        'tip': 'Dica',
+        'classifications': 'Classificações',
         'prediction_result': 'Resultado da Predição',
         'confidence': 'Confiança',
         'model_performance': 'Performance dos Modelos',
@@ -211,7 +218,14 @@ TRANSLATIONS = {
         'precision_label': 'Precision',
         'recall_label': 'Recall',
         'f1_score_label': 'F1-Score',
-    },
+        'external_resources': 'External Resources',
+        'source_code': 'Source Code',
+        'technical_resources': 'Technical Resources',
+        'analysis_variables': 'Analysis Variables',
+        'spreadsheet_format': 'Standard Spreadsheet Format',
+        'required_columns': 'Required Columns',
+        'tip': 'Tip',
+        'classifications': 'Classifications',
     'es': {
         'page_title': 'Detección de Exoplanetas con IA',
         'main_header': 'Sistema de Detección de Exoplanetas con IA',
@@ -303,7 +317,14 @@ TRANSLATIONS = {
         'precision_label': 'Exactitud',
         'recall_label': 'Recuperación',
         'f1_score_label': 'F1-Score',
-    }
+        'external_resources': 'Recursos Externos',
+        'source_code': 'Código Fuente',
+        'technical_resources': 'Recursos Técnicos',
+        'analysis_variables': 'Variables de Análisis',
+        'spreadsheet_format': 'Formato de Hoja de Cálculo Estándar',
+        'required_columns': 'Columnas Requeridas',
+        'tip': 'Consejo',
+        'classifications': 'Clasificaciones',
 }
 
 def get_translation(key, lang='pt'):
@@ -323,6 +344,27 @@ def clear_all_data():
     # Limpar estado de confirmação
     if 'confirm_reset' in st.session_state:
         del st.session_state['confirm_reset']
+    
+    # Limpar cache do navegador usando JavaScript
+    st.markdown("""
+    <script>
+    // Limpar localStorage
+    localStorage.clear();
+    
+    // Limpar sessionStorage
+    sessionStorage.clear();
+    
+    // Limpar cookies relacionados ao Streamlit
+    document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+    });
+    
+    // Forçar reload da página para limpar cache
+    setTimeout(function() {
+        window.location.reload();
+    }, 1000);
+    </script>
+    """, unsafe_allow_html=True)
     
     return True
 
@@ -915,8 +957,8 @@ def main():
         - **Ensemble**: Combinação para máxima robustez
         """)
         
-        st.markdown("""
-        ### Variáveis de Análise
+        st.markdown(f"""
+        ### {get_translation("analysis_variables", selected_language)}
         
         - **Período Orbital**: Duração da órbita do planeta
         - **Duração do Trânsito**: Tempo de transição
@@ -924,9 +966,9 @@ def main():
         - **Raio Planetário**: Tamanho relativo à Terra
         - **Temperatura de Equilíbrio**: Estimativa térmica
         
-        ### Formato da Planilha Padrão
+        ### {get_translation("spreadsheet_format", selected_language)}
         
-        **Colunas Obrigatórias:**
+        **{get_translation("required_columns", selected_language)}:**
         ```
         koi_name          - Nome do objeto (ex: KOI-1.01)
         koi_period        - Período orbital em dias
@@ -939,17 +981,17 @@ def main():
         koi_disposition   - Classificação (CONFIRMED/CANDIDATE/FALSE POSITIVE)
         ```
         
-        **Dica:** Use o botão "Baixar Template CSV" na sidebar para obter um exemplo completo!
+        **{get_translation("tip", selected_language)}:** Use o botão "Baixar Template CSV" na sidebar para obter um exemplo completo!
         """)
         
-        st.markdown("""
-        ### Classificações
+        st.markdown(f"""
+        ### {get_translation("classifications", selected_language)}
         
         - **Confirmado**: Planeta validado por múltiplas observações
         - **Candidato**: Requer validação adicional
         - **Falso Positivo**: Fenômeno estelar não planetário
         
-        ### Recursos Técnicos
+        ### {get_translation("technical_resources", selected_language)}
         
         - Interface web responsiva com Streamlit
         - Visualizações interativas com Plotly
@@ -958,7 +1000,7 @@ def main():
         - Sistema de modelos ensemble
         """)
         
-        st.subheader("🔗 Recursos Externos")
+        st.subheader(f"🔗 {get_translation('external_resources', selected_language)}")
         st.markdown("""
         - [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)
         - [Kepler Mission](https://www.nasa.gov/mission_pages/kepler/main/)
@@ -966,7 +1008,7 @@ def main():
         - [K2 Mission](https://keplerscience.arc.nasa.gov/k2/)
         """)
         
-        st.subheader("📖 Código Fonte")
+        st.subheader(f"📖 {get_translation('source_code', selected_language)}")
         st.code("""
 # Example: Executar sistema completo
 from exoplanet_ml import ExoplanetDetector
