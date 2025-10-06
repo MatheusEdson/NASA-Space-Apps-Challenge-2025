@@ -86,6 +86,14 @@ TRANSLATIONS = {
         'reset_description': 'Limpa todos os dados simulados para permitir upload de dados próprios',
         'confirm': 'Confirmar',
         'cancel': 'Cancelar',
+        'unsupported_format': 'Formato não suportado. Use CSV ou XLSX.',
+        'data_preview': 'Prévia dos Dados',
+        'data_info': 'Informações dos Dados',
+        'rows': 'Linhas',
+        'columns': 'Colunas',
+        'analyze_data': 'Analisar Dados',
+        'analyzing': 'Analisando dados...',
+        'analysis_complete': 'Análise concluída com sucesso!',
         'about_system': 'Sobre o Sistema',
         'methodology': 'Metodologia',
         'data_preprocessing': 'Pré-processamento dos Dados',
@@ -202,6 +210,14 @@ TRANSLATIONS = {
         'reset_description': 'Clears all simulated data to allow upload of your own data',
         'confirm': 'Confirm',
         'cancel': 'Cancel',
+        'unsupported_format': 'Unsupported format. Use CSV or XLSX.',
+        'data_preview': 'Data Preview',
+        'data_info': 'Data Information',
+        'rows': 'Rows',
+        'columns': 'Columns',
+        'analyze_data': 'Analyze Data',
+        'analyzing': 'Analyzing data...',
+        'analysis_complete': 'Analysis completed successfully!',
         'about_system': 'About the System',
         'methodology': 'Methodology',
         'data_preprocessing': 'Data Pre-processing',
@@ -302,6 +318,14 @@ TRANSLATIONS = {
         'reset_description': 'Limpia todos los datos simulados para permitir la carga de datos propios',
         'confirm': 'Confirmar',
         'cancel': 'Cancelar',
+        'unsupported_format': 'Formato no soportado. Use CSV o XLSX.',
+        'data_preview': 'Vista Previa de Datos',
+        'data_info': 'Información de Datos',
+        'rows': 'Filas',
+        'columns': 'Columnas',
+        'analyze_data': 'Analizar Datos',
+        'analyzing': 'Analizando datos...',
+        'analysis_complete': 'Análisis completado exitosamente!',
         'about_system': 'Acerca del Sistema',
         'methodology': 'Metodología',
         'data_preprocessing': 'Preprocesamiento de Datos',
@@ -335,13 +359,15 @@ def get_translation(key, lang='pt'):
 
 def clear_all_data():
     """Limpa todos os dados simulados e cache"""
-    # Limpar dados da sessão
+    # Lista completa de chaves para limpar
     keys_to_clear = [
         'real_time_data', 'uploaded_data', 'confirm_reset',
         'upload_file', 'analysis_results', 'prediction_data',
-        'model_results', 'data_processed'
+        'model_results', 'data_processed', 'uploaded_filename',
+        'processed_data', 'features', 'detector_model'
     ]
     
+    # Limpar chaves específicas
     for key in keys_to_clear:
         if key in st.session_state:
             del st.session_state[key]
@@ -349,9 +375,13 @@ def clear_all_data():
     # Limpar outros estados relacionados dinamicamente
     all_keys = list(st.session_state.keys())
     for key in all_keys:
-        if any(prefix in key.lower() for prefix in ['upload', 'analysis', 'prediction', 'model', 'data']):
-            if key not in ['selected_language']:  # Manter idioma selecionado
+        if any(prefix in key.lower() for prefix in ['upload', 'analysis', 'prediction', 'model', 'data', 'file']):
+            if key not in ['selected_language', 'status']:  # Manter configurações importantes
                 del st.session_state[key]
+    
+    # Forçar limpeza do cache de dados simulados
+    if hasattr(st, 'cache_data'):
+        st.cache_data.clear()
     
     return True
 
@@ -593,7 +623,55 @@ def main():
         uploaded_file = st.file_uploader(get_translation("load_dataset", selected_language), type=['csv', 'xlsx'])
         
         if uploaded_file:
-            st.success(f"{get_translation('file_loaded', selected_language)} {uploaded_file.name}")
+            try:
+                # Processar arquivo CSV
+                if uploaded_file.name.endswith('.csv'):
+                    df = pd.read_csv(uploaded_file)
+                elif uploaded_file.name.endswith('.xlsx'):
+                    df = pd.read_excel(uploaded_file)
+                else:
+                    st.error(get_translation("unsupported_format", selected_language))
+                    df = None
+                
+                if df is not None:
+                    st.success(f"{get_translation('file_loaded', selected_language)} {uploaded_file.name}")
+                    st.write(f"**{get_translation('data_preview', selected_language)}:**")
+                    st.dataframe(df.head())
+                    
+                    # Salvar dados na sessão
+                    st.session_state['uploaded_data'] = df
+                    st.session_state['uploaded_filename'] = uploaded_file.name
+                    
+                    # Mostrar estatísticas básicas
+                    st.write(f"**{get_translation('data_info', selected_language)}:**")
+                    st.write(f"- {get_translation('rows', selected_language)}: {len(df)}")
+                    st.write(f"- {get_translation('columns', selected_language)}: {len(df.columns)}")
+                    
+                    # Botão para analisar dados carregados
+                    if st.button(get_translation("analyze_data", selected_language), type="primary"):
+                        with st.spinner(get_translation("analyzing", selected_language)):
+                            try:
+                                detector = initialize_detector()
+                                processed_df, features = detector.preprocess_data(df)
+                                results = detector.train_models(processed_df, features)
+                                
+                                st.session_state['analysis_results'] = results
+                                st.session_state['processed_data'] = processed_df
+                                st.session_state['features'] = features
+                                
+                                st.success(get_translation("analysis_complete", selected_language))
+                                
+                                # Mostrar resultados
+                                st.write("**Resultados da Análise:**")
+                                for model_name, result in results.items():
+                                    if isinstance(result, dict) and 'accuracy' in result:
+                                        st.write(f"- {model_name}: {result['accuracy']:.3f}")
+                                
+                            except Exception as e:
+                                st.error(f"Erro na análise: {str(e)}")
+                    
+            except Exception as e:
+                st.error(f"Erro ao carregar arquivo: {str(e)}")
     
     # Layout principal com tabs
     tab1, tab2, tab3, tab4 = st.tabs([
