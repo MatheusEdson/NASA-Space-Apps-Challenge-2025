@@ -86,6 +86,6 @@ streamlit run streamlit_app.py
 
 ---
 
-**🌌 NASA Space Apps Challenge 2024**  
+**🌌 NASA Space Apps Challenge 2025**  
 **Categoria**: Machine Learning/Artificial Intelligence  
 **Status**: ✅ Implementado e em produção
