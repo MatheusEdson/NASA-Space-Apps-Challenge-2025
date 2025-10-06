@@ -1292,26 +1292,6 @@ def main():
     
     with tab2:
         st.header(get_translation("manual_analysis", selected_language))
-
-        col_p1, col_p2, col_p3 = st.columns(3)
-
-        with col_p1:
-            orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=365.25)
-            transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=8.0)
-            planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.0)
-
-        with col_p2:
-            stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0)
-            stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0)
-            equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=300.0)
-
-        with col_p3:
-            impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.5)
-            stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4)
-            kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0)
-
-    with tab2:
-        st.header(get_translation("manual_analysis", selected_language))
         
         # Verificar se há dados carregados
         if 'adapted_data' in st.session_state:
