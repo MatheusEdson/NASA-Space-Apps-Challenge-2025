@@ -335,21 +335,22 @@ def get_translation(key, lang='pt'):
 def clear_all_data():
     """Limpa todos os dados simulados e cache"""
     # Limpar dados da sessão
-    if 'real_time_data' in st.session_state:
-        del st.session_state['real_time_data']
+    keys_to_clear = [
+        'real_time_data', 'uploaded_data', 'confirm_reset',
+        'upload_file', 'analysis_results', 'prediction_data',
+        'model_results', 'data_processed'
+    ]
     
-    # Limpar dados de upload
-    if 'uploaded_data' in st.session_state:
-        del st.session_state['uploaded_data']
-    
-    # Limpar estado de confirmação
-    if 'confirm_reset' in st.session_state:
-        del st.session_state['confirm_reset']
-    
-    # Limpar outros estados relacionados
-    keys_to_clear = [key for key in st.session_state.keys() if key.startswith('upload') or key.startswith('analysis')]
     for key in keys_to_clear:
-        del st.session_state[key]
+        if key in st.session_state:
+            del st.session_state[key]
+    
+    # Limpar outros estados relacionados dinamicamente
+    all_keys = list(st.session_state.keys())
+    for key in all_keys:
+        if any(prefix in key.lower() for prefix in ['upload', 'analysis', 'prediction', 'model', 'data']):
+            if key not in ['selected_language']:  # Manter idioma selecionado
+                del st.session_state[key]
     
     return True
 
@@ -467,9 +468,12 @@ def initialize_detector():
     return ExoplanetDetector()
 
 # Cache para dados simulados em tempo real
-@st.cache_data(ttl=10)
 def get_real_time_data():
     """Simula dados em tempo real do sistema"""
+    # Verificar se há dados em cache na sessão
+    if 'real_time_data' in st.session_state:
+        return st.session_state['real_time_data']
+    
     current_time = datetime.now()
     
     # Simular dados de análise em tempo real
@@ -484,6 +488,8 @@ def get_real_time_data():
         'model_active': np.random.choice(['Random Forest', 'XGBoost', 'LightGBM'])
     }
     
+    # Salvar na sessão para poder ser limpo
+    st.session_state['real_time_data'] = data
     return data
 
 def main():
@@ -559,7 +565,7 @@ def main():
             with col1:
                 if st.button(get_translation("confirm", selected_language), type="primary"):
                     clear_all_data()
-                    st.success(get_translation("data_cleared", selected_language))
+                    st.success("✅ " + get_translation("data_cleared", selected_language) + " - Todos os dados foram resetados!")
                     st.session_state['confirm_reset'] = False
                     st.rerun()
             with col2:
