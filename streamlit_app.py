@@ -992,8 +992,8 @@ def main():
     with tab1:
         st.header(get_translation("real_time_analysis", selected_language))
         
-        # Botões de controle
-        col_btn1, col_btn2 = st.columns(2)
+        # Botões de controle - layout com botão direito alinhado
+        col_btn1, col_btn2, col_btn3 = st.columns([2, 1, 1])
         
         with col_btn1:
             # Botão para buscar dados das bases NASA
@@ -1034,8 +1034,8 @@ def main():
                 status_text.empty()
                 st.rerun()
         
-        with col_btn2:
-            # Botão para limpar dados
+        with col_btn3:
+            # Botão para limpar dados (alinhado à direita)
             if st.button("🗑️ Limpar Dados", type="secondary"):
                 if st.session_state.get('confirm_reset', False):
                     clear_all_data()
@@ -1462,19 +1462,19 @@ def main():
             col_p1, col_p2, col_p3 = st.columns(3)
 
             with col_p1:
-                orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=365.25)
-                transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=8.0)
-                planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.0)
+                orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=365.25, key="manual_orbital_period")
+                transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=8.0, key="manual_transit_duration")
+                planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.0, key="manual_planet_radius")
 
             with col_p2:
-                stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0)
-                stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0)
-                equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=300.0)
+                stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0, key="manual_stellar_mass")
+                stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0, key="manual_stellar_radius")
+                equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=300.0, key="manual_equilibrium_temp")
 
             with col_p3:
-                impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.5)
-                stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4)
-                kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0)
+                impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.5, key="manual_impact_parameter")
+                stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4, key="manual_stellar_density")
+                kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0, key="manual_kepmag")
 
             if st.button(get_translation("analyze", selected_language)):
                 st.info("🔬 **Modo de análise manual** - Para análise completa, faça upload de dados na aba 'Análise'")
