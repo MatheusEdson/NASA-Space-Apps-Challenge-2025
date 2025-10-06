@@ -79,6 +79,12 @@ TRANSLATIONS = {
         'sample': 'Amostra',
         'n_estimators': 'Número de Estimadores',
         'max_depth': 'Profundidade Máxima',
+        'reset_data': 'Limpar Dados',
+        'reset_confirmation': 'Tem certeza que deseja limpar todos os dados?',
+        'data_cleared': 'Dados limpos com sucesso!',
+        'reset_description': 'Limpa todos os dados simulados para permitir upload de dados próprios',
+        'confirm': 'Confirmar',
+        'cancel': 'Cancelar',
         'analyze': 'Analisar',
         'prediction_result': 'Resultado da Predição',
         'confidence': 'Confiança',
@@ -166,7 +172,13 @@ TRANSLATIONS = {
         'samples': 'Samples',
         'sample': 'Sample',
         'n_estimators': 'Number of Estimators',
-        'max_depth': 'Maximum Depth'
+        'max_depth': 'Maximum Depth',
+        'reset_data': 'Clear Data',
+        'reset_confirmation': 'Are you sure you want to clear all data?',
+        'data_cleared': 'Data cleared successfully!',
+        'reset_description': 'Clears all simulated data to allow upload of your own data',
+        'confirm': 'Confirm',
+        'cancel': 'Cancel'
     },
     'es': {
         'page_title': 'Detección de Exoplanetas con IA',
@@ -236,13 +248,35 @@ TRANSLATIONS = {
         'samples': 'Muestras',
         'sample': 'Muestra',
         'n_estimators': 'Número de Estimadores',
-        'max_depth': 'Profundidad Máxima'
+        'max_depth': 'Profundidad Máxima',
+        'reset_data': 'Limpiar Datos',
+        'reset_confirmation': '¿Estás seguro de que quieres limpiar todos los datos?',
+        'data_cleared': '¡Datos limpiados exitosamente!',
+        'reset_description': 'Limpia todos los datos simulados para permitir la carga de datos propios',
+        'confirm': 'Confirmar',
+        'cancel': 'Cancelar'
     }
 }
 
 def get_translation(key, lang='pt'):
     """Retorna a tradução para a chave especificada"""
     return TRANSLATIONS.get(lang, TRANSLATIONS['pt']).get(key, key)
+
+def clear_all_data():
+    """Limpa todos os dados simulados e cache"""
+    # Limpar cache do Streamlit
+    st.cache_data.clear()
+    st.cache_resource.clear()
+    
+    # Limpar dados da sessão
+    if 'real_time_data' in st.session_state:
+        del st.session_state['real_time_data']
+    
+    # Limpar dados de upload
+    if 'uploaded_data' in st.session_state:
+        del st.session_state['uploaded_data']
+    
+    return True
 
 def get_language_selector():
     """Cria o seletor de idioma"""
@@ -429,6 +463,31 @@ def main():
         st.subheader(get_translation("settings", selected_language))
         update_interval = st.slider(get_translation("update_interval", selected_language), 1, 30, 5)
         confidence_threshold = st.slider(get_translation("confidence_threshold", selected_language), 0.0, 1.0, 0.8)
+        
+        # Botão para limpar dados
+        st.markdown("---")
+        st.subheader(get_translation("reset_data", selected_language))
+        st.markdown(get_translation("reset_description", selected_language))
+        
+        if st.button(get_translation("reset_data", selected_language), type="secondary"):
+            if st.session_state.get('confirm_reset', False):
+                clear_all_data()
+                st.success(get_translation("data_cleared", selected_language))
+                st.session_state['confirm_reset'] = False
+                st.rerun()
+            else:
+                st.session_state['confirm_reset'] = True
+                st.warning(get_translation("reset_confirmation", selected_language))
+        
+        if st.session_state.get('confirm_reset', False):
+            if st.button(get_translation("confirm", selected_language), type="primary"):
+                clear_all_data()
+                st.success(get_translation("data_cleared", selected_language))
+                st.session_state['confirm_reset'] = False
+                st.rerun()
+            if st.button(get_translation("cancel", selected_language)):
+                st.session_state['confirm_reset'] = False
+                st.rerun()
         
         # Upload de dados
         st.subheader(get_translation("data_upload", selected_language))
