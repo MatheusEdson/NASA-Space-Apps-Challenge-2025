@@ -366,6 +366,116 @@ def get_translation(key, lang='pt'):
     """Retorna a tradução para a chave especificada"""
     return TRANSLATIONS.get(lang, TRANSLATIONS['pt']).get(key, key)
 
+def safe_read_file(uploaded_file, selected_language):
+    """Lê arquivo de forma segura com tratamento de erros"""
+    try:
+        # Verificar tipo de arquivo
+        if uploaded_file.name.endswith('.csv'):
+            # Tentar diferentes encodings para CSV
+            encodings = ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
+            df = None
+            
+            for encoding in encodings:
+                try:
+                    uploaded_file.seek(0)  # Reset file pointer
+                    df = pd.read_csv(uploaded_file, encoding=encoding)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            
+            if df is None:
+                return None, "Não foi possível ler o arquivo CSV. Verifique a codificação."
+                
+        elif uploaded_file.name.endswith('.xlsx'):
+            df = pd.read_excel(uploaded_file)
+        else:
+            return None, "Formato não suportado. Use CSV ou XLSX."
+        
+        # Verificar se o DataFrame não está vazio
+        if df.empty:
+            return None, "Arquivo está vazio ou não contém dados válidos."
+        
+        # Verificar se tem pelo menos algumas colunas
+        if len(df.columns) < 3:
+            return None, "Arquivo deve ter pelo menos 3 colunas de dados."
+        
+        return df, None
+        
+    except Exception as e:
+        return None, f"Erro ao ler arquivo: {str(e)}"
+
+def validate_dataframe(df, selected_language):
+    """Valida se o DataFrame tem as colunas necessárias"""
+    try:
+        # Colunas obrigatórias (flexível - aceita variações)
+        required_columns = {
+            'koi_name': ['koi_name', 'name', 'object_name', 'planet_name'],
+            'koi_period': ['koi_period', 'period', 'orbital_period'],
+            'koi_depth': ['koi_depth', 'depth', 'transit_depth'],
+            'koi_duration': ['koi_duration', 'duration', 'transit_duration'],
+            'koi_prad': ['koi_prad', 'prad', 'planet_radius'],
+            'koi_teq': ['koi_teq', 'teq', 'equilibrium_temperature'],
+            'koi_insol': ['koi_insol', 'insol', 'stellar_irradiance'],
+            'koi_impact': ['koi_impact', 'impact', 'impact_parameter'],
+            'koi_disposition': ['koi_disposition', 'disposition', 'classification']
+        }
+        
+        # Verificar se encontramos pelo menos algumas colunas essenciais
+        found_columns = {}
+        df_columns_lower = [col.lower().strip() for col in df.columns]
+        
+        for required_key, possible_names in required_columns.items():
+            for possible_name in possible_names:
+                if possible_name.lower() in df_columns_lower:
+                    found_columns[required_key] = possible_name
+                    break
+        
+        # Verificar se temos pelo menos 5 colunas essenciais
+        essential_columns = ['koi_name', 'koi_period', 'koi_depth', 'koi_prad', 'koi_disposition']
+        found_essential = sum(1 for col in essential_columns if col in found_columns)
+        
+        if found_essential < 3:
+            return False, f"Apenas {found_essential} colunas essenciais encontradas. Necessário pelo menos 3."
+        
+        # Verificar se há dados válidos
+        numeric_columns = ['koi_period', 'koi_depth', 'koi_prad']
+        for col in numeric_columns:
+            if col in found_columns:
+                col_name = found_columns[col]
+                if not pd.api.types.is_numeric_dtype(df[col_name]):
+                    return False, f"Coluna '{col_name}' deve conter valores numéricos."
+        
+        return True, "Dados válidos"
+        
+    except Exception as e:
+        return False, f"Erro na validação: {str(e)}"
+
+def process_uploaded_data(df, selected_language):
+    """Processa dados carregados de forma segura"""
+    try:
+        detector = initialize_detector()
+        
+        # Preparar dados para processamento
+        processed_df, features = detector.preprocess_data(df)
+        
+        if processed_df.empty:
+            return None, "Dados processados estão vazios. Verifique o formato dos dados."
+        
+        # Treinar modelos
+        results = detector.train_models(processed_df, features)
+        
+        if not results:
+            return None, "Falha ao treinar modelos. Verifique se os dados são adequados."
+        
+        # Salvar dados processados na sessão
+        st.session_state['processed_data'] = processed_df
+        st.session_state['features'] = features
+        
+        return results, None
+        
+    except Exception as e:
+        return None, f"Erro no processamento: {str(e)}"
+
 def clear_all_data():
     """Limpa todos os dados simulados e cache"""
     # Lista completa de chaves para limpar
@@ -617,58 +727,115 @@ def main():
             help=get_translation("template_help", selected_language)
         )
         
+        # Botão de teste do sistema
+        st.markdown("---")
+        st.subheader("🧪 Teste do Sistema")
+        
+        if st.button("Testar Sistema com Dados de Exemplo", type="secondary"):
+            with st.spinner("Executando teste..."):
+                try:
+                    # Criar dados de teste
+                    test_data = pd.DataFrame({
+                        'koi_name': ['TEST-001', 'TEST-002', 'TEST-003'],
+                        'koi_period': [3.5, 5.2, 2.1],
+                        'koi_depth': [0.001, 0.002, 0.0015],
+                        'koi_duration': [2.5, 3.1, 1.8],
+                        'koi_prad': [1.2, 0.8, 1.5],
+                        'koi_teq': [500, 400, 600],
+                        'koi_insol': [1.5, 0.8, 2.1],
+                        'koi_impact': [0.3, 0.1, 0.5],
+                        'koi_disposition': ['CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE']
+                    })
+                    
+                    # Testar validação
+                    is_valid, validation_msg = validate_dataframe(test_data, selected_language)
+                    
+                    if is_valid:
+                        st.success("✅ **Teste de validação passou!**")
+                        
+                        # Testar processamento
+                        results, process_error = process_uploaded_data(test_data, selected_language)
+                        
+                        if process_error:
+                            st.error(f"❌ **Erro no processamento:** {process_error}")
+                        else:
+                            st.success("✅ **Teste de processamento passou!**")
+                            st.write("**Resultados do teste:**")
+                            for model_name, result in results.items():
+                                if isinstance(result, dict) and 'accuracy' in result:
+                                    st.write(f"- {model_name}: {result['accuracy']:.3f}")
+                            
+                            st.balloons()
+                            st.info("🎉 **Sistema funcionando perfeitamente!**")
+                    else:
+                        st.error(f"❌ **Erro na validação:** {validation_msg}")
+                        
+                except Exception as e:
+                    st.error(f"❌ **Erro no teste:** {str(e)}")
+        
+        st.info("💡 **Dica:** Use este teste para verificar se o sistema está funcionando antes de fazer upload de seus dados.")
+        
         uploaded_file = st.file_uploader(get_translation("load_dataset", selected_language), type=['csv', 'xlsx'])
         
         if uploaded_file:
-            try:
-                # Processar arquivo CSV
-                if uploaded_file.name.endswith('.csv'):
-                    df = pd.read_csv(uploaded_file)
-                elif uploaded_file.name.endswith('.xlsx'):
-                    df = pd.read_excel(uploaded_file)
-                else:
-                    st.error(get_translation("unsupported_format", selected_language))
-                    df = None
+            # Ler arquivo de forma segura
+            df, error = safe_read_file(uploaded_file, selected_language)
+            
+            if error:
+                st.error(f"❌ {error}")
+                st.info("💡 **Dica:** Use o template CSV disponível para download como referência")
+                return
+            
+            if df is not None:
+                st.success(f"✅ {get_translation('file_loaded', selected_language)} {uploaded_file.name}")
                 
-                if df is not None:
-                    st.success(f"{get_translation('file_loaded', selected_language)} {uploaded_file.name}")
-                    st.write(f"**{get_translation('data_preview', selected_language)}:**")
-                    st.dataframe(df.head())
-                    
-                    # Salvar dados na sessão
-                    st.session_state['uploaded_data'] = df
-                    st.session_state['uploaded_filename'] = uploaded_file.name
-                    
-                    # Mostrar estatísticas básicas
-                    st.write(f"**{get_translation('data_info', selected_language)}:**")
-                    st.write(f"- {get_translation('rows', selected_language)}: {len(df)}")
-                    st.write(f"- {get_translation('columns', selected_language)}: {len(df.columns)}")
-                    
-                    # Botão para analisar dados carregados
-                    if st.button(get_translation("analyze_data", selected_language), type="primary"):
-                        with st.spinner(get_translation("analyzing", selected_language)):
-                            try:
-                                detector = initialize_detector()
-                                processed_df, features = detector.preprocess_data(df)
-                                results = detector.train_models(processed_df, features)
-                                
-                                st.session_state['analysis_results'] = results
-                                st.session_state['processed_data'] = processed_df
-                                st.session_state['features'] = features
-                                
-                                st.success(get_translation("analysis_complete", selected_language))
-                                
-                                # Mostrar resultados
-                                st.write(f"**{get_translation('analysis_results', selected_language)}:**")
-                                for model_name, result in results.items():
-                                    if isinstance(result, dict) and 'accuracy' in result:
-                                        st.write(f"- {model_name}: {result['accuracy']:.3f}")
-                                
-                            except Exception as e:
-                                st.error(f"Erro na análise: {str(e)}")
-                    
-            except Exception as e:
-                st.error(f"Erro ao carregar arquivo: {str(e)}")
+                # Mostrar informações do arquivo
+                st.write(f"**{get_translation('data_info', selected_language)}:**")
+                st.write(f"- {get_translation('rows', selected_language)}: {len(df)}")
+                st.write(f"- {get_translation('columns', selected_language)}: {len(df.columns)}")
+                
+                # Mostrar colunas encontradas
+                st.write(f"**Colunas encontradas:**")
+                st.write(", ".join(df.columns.tolist()))
+                
+                # Validar dados
+                is_valid, validation_message = validate_dataframe(df, selected_language)
+                
+                if not is_valid:
+                    st.error(f"❌ **Problema nos dados:** {validation_message}")
+                    st.warning("🔧 **Solução:** Verifique se seu arquivo tem as colunas necessárias:")
+                    st.code("koi_name, koi_period, koi_depth, koi_duration, koi_prad, koi_teq, koi_insol, koi_impact, koi_disposition")
+                    return
+                
+                st.success("✅ **Dados validados com sucesso!**")
+                
+                # Mostrar prévia dos dados
+                st.write(f"**{get_translation('data_preview', selected_language)}:**")
+                st.dataframe(df.head(10))
+                
+                # Salvar dados na sessão
+                st.session_state['uploaded_data'] = df
+                st.session_state['uploaded_filename'] = uploaded_file.name
+                
+                # Botão para analisar dados carregados
+                if st.button(get_translation("analyze_data", selected_language), type="primary"):
+                    with st.spinner(get_translation("analyzing", selected_language)):
+                        results, process_error = process_uploaded_data(df, selected_language)
+                        
+                        if process_error:
+                            st.error(f"❌ **Erro na análise:** {process_error}")
+                            st.info("💡 **Sugestão:** Verifique se os dados estão no formato correto e tente novamente")
+                        else:
+                            st.session_state['analysis_results'] = results
+                            st.success(get_translation("analysis_complete", selected_language))
+                            
+                            # Mostrar resultados
+                            st.write(f"**{get_translation('analysis_results', selected_language)}:**")
+                            for model_name, result in results.items():
+                                if isinstance(result, dict) and 'accuracy' in result:
+                                    st.write(f"- {model_name}: {result['accuracy']:.3f}")
+                            
+                            st.balloons()  # Celebração!
     
     # Layout principal com tabs
     tab1, tab2, tab3, tab4 = st.tabs([
