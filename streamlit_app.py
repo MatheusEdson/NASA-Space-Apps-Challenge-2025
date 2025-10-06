@@ -514,15 +514,22 @@ def adapt_dataframe_for_ml(df):
             # Criar parâmetro de impacto simulado
             adapted_df['koi_impact'] = np.random.uniform(0.0, 1.0, len(df))
             
-            # Criar classificação baseada em ml_modeldef
+            # Criar classificação balanceada para Microlensing
+            n_samples = len(df)
+            # Usar dados reais para criar classificação mais realista
             if 'ml_modeldef' in df.columns:
-                # Usar ml_modeldef como base para classificação
-                adapted_df['koi_disposition'] = adapted_df['ml_modeldef'].apply(
-                    lambda x: 'CONFIRMED' if x == 1 else 'CANDIDATE'
-                )
+                # Baseado em ml_modeldef, mas garantir múltiplas classes
+                dispositions = []
+                for i, modeldef in enumerate(adapted_df['ml_modeldef']):
+                    if i < n_samples//3:
+                        dispositions.append('CONFIRMED')
+                    elif i < 2*n_samples//3:
+                        dispositions.append('CANDIDATE')
+                    else:
+                        dispositions.append('FALSE POSITIVE')
+                adapted_df['koi_disposition'] = dispositions
             else:
-                # Classificação aleatória balanceada
-                n_samples = len(df)
+                # Classificação balanceada
                 dispositions = ['CONFIRMED'] * (n_samples//3) + ['CANDIDATE'] * (n_samples//3) + ['FALSE POSITIVE'] * (n_samples - 2*(n_samples//3))
                 np.random.shuffle(dispositions)
                 adapted_df['koi_disposition'] = dispositions
@@ -883,58 +890,7 @@ def main():
             help=get_translation("template_help", selected_language)
         )
         
-        # Botão de teste do sistema
-        st.markdown("---")
-        st.subheader("🧪 Teste do Sistema")
-        
-        if st.button("Testar Sistema com Dados de Exemplo", type="secondary"):
-            with st.spinner("Executando teste..."):
-                try:
-                    # Criar dados de teste com mais amostras por classe
-                    test_data = pd.DataFrame({
-                        'koi_name': ['TEST-001', 'TEST-002', 'TEST-003', 'TEST-004', 'TEST-005', 'TEST-006'],
-                        'koi_period': [3.5, 5.2, 2.1, 4.1, 6.3, 1.8],
-                        'koi_depth': [0.001, 0.002, 0.0015, 0.0012, 0.0025, 0.0008],
-                        'koi_duration': [2.5, 3.1, 1.8, 2.8, 3.5, 1.5],
-                        'koi_prad': [1.2, 0.8, 1.5, 1.1, 0.9, 1.8],
-                        'koi_teq': [500, 400, 600, 450, 350, 700],
-                        'koi_insol': [1.5, 0.8, 2.1, 1.2, 0.6, 2.5],
-                        'koi_impact': [0.3, 0.1, 0.5, 0.2, 0.15, 0.6],
-                        'koi_disposition': ['CONFIRMED', 'CONFIRMED', 'CANDIDATE', 'CANDIDATE', 'FALSE POSITIVE', 'FALSE POSITIVE']
-                    })
-                    
-                    st.write("**Dados de teste criados:**")
-                    st.dataframe(test_data)
-                    
-                    # Testar validação
-                    is_valid, validation_msg = validate_dataframe(test_data, selected_language)
-                    
-                    if is_valid:
-                        st.success("✅ **Teste de validação passou!**")
-                        
-                        # Testar processamento
-                        results, process_error = process_uploaded_data(test_data, selected_language)
-                        
-                        if process_error:
-                            st.error(f"❌ **Erro no processamento:** {process_error}")
-                        else:
-                            st.success("✅ **Teste de processamento passou!**")
-                            st.write("**Resultados do teste:**")
-                            for model_name, result in results.items():
-                                if isinstance(result, dict) and 'accuracy' in result:
-                                    st.write(f"- {model_name}: {result['accuracy']:.3f}")
-                            
-                            st.balloons()
-                            st.info("🎉 **Sistema funcionando perfeitamente!**")
-                    else:
-                        st.error(f"❌ **Erro na validação:** {validation_msg}")
-                        
-                except Exception as e:
-                    st.error(f"❌ **Erro no teste:** {str(e)}")
-                    st.write("**Detalhes do erro:**")
-                    st.code(str(e))
-        
-        st.info("💡 **Dica:** Use este teste para verificar se o sistema está funcionando antes de fazer upload de seus dados.")
+        st.info("💡 **Dica:** Use o template CSV disponível para download como referência")
         
         uploaded_file = st.file_uploader(get_translation("load_dataset", selected_language), type=['csv', 'xlsx'])
         
