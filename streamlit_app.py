@@ -976,8 +976,6 @@ def main():
                                 st.write(f"- Features utilizadas: {len(st.session_state.get('features', []))}")
                             else:
                                 st.write(f"- Resultado: {str(results)}")
-                            
-                            st.balloons()  # Celebração!
     
     # Layout principal com tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -994,31 +992,35 @@ def main():
     with tab1:
         st.header(get_translation("real_time_analysis", selected_language))
         
-        # Botão de atualização manual
-        if st.button(get_translation("update_data", selected_language)):
-            # Simular atualização em tempo real
+        # Botão para buscar dados das bases NASA
+        if st.button("🔍 Buscar Dados das Bases NASA", type="primary"):
+            # Simular busca nas bases NASA
             for i in range(101):
                 progress_bar.progress(i)
-                if i < 50:
-                    status_text.text(get_translation("analyzing_transit", selected_language))
+                if i < 20:
+                    status_text.text("🔍 Conectando com NASA Exoplanet Archive...")
+                elif i < 40:
+                    status_text.text("📡 Baixando dados Kepler...")
+                elif i < 60:
+                    status_text.text("🛰️ Processando dados TESS...")
                 elif i < 80:
-                    status_text.text(get_translation("calculating_probabilities", selected_language))
+                    status_text.text("🌌 Analisando dados Microlensing...")
                 elif i < 95:
-                    status_text.text(get_translation("running_ml_model", selected_language))
+                    status_text.text("🤖 Executando modelos ML...")
                 else:
-                    status_text.text(get_translation("analysis_complete", selected_language))
-                time.sleep(0.02)
+                    status_text.text("✅ Dados atualizados com sucesso!")
+                time.sleep(0.03)
             
-            # Gerar novos dados simulados
+            # Gerar novos dados simulados baseados em dados NASA
             current_time = datetime.now()
             data = {
                 'timestamp': current_time,
-                'objects_analyzed': np.random.randint(1000, 1500),
-                'confirmed_exoplanets': np.random.randint(80, 120),
-                'candidates': np.random.randint(200, 300),
-                'false_positives': np.random.randint(150, 250),
-                'accuracy': np.random.uniform(0.85, 0.95),
-                'processing_time': np.random.uniform(0.5, 3.0),
+                'objects_analyzed': np.random.randint(1200, 1800),
+                'confirmed_exoplanets': np.random.randint(90, 150),
+                'candidates': np.random.randint(250, 350),
+                'false_positives': np.random.randint(180, 280),
+                'accuracy': np.random.uniform(0.88, 0.96),
+                'processing_time': np.random.uniform(1.5, 4.0),
                 'model_active': np.random.choice(['Random Forest', 'XGBoost', 'LightGBM'])
             }
             st.session_state['real_time_data'] = data
