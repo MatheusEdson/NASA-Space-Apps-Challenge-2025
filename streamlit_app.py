@@ -418,7 +418,7 @@ def main():
     # Sidebar
     with st.sidebar:
         # Obter idioma selecionado
-        selected_language = get_language_selector('sidebar')
+        selected_language = get_language_selector()
         st.header(get_translation("system_controls", selected_language))
         
         # Status do sistema
