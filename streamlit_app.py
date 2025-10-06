@@ -85,6 +85,22 @@ TRANSLATIONS = {
         'reset_description': 'Limpa todos os dados simulados para permitir upload de dados próprios',
         'confirm': 'Confirmar',
         'cancel': 'Cancelar',
+        'about_system': 'Sobre o Sistema',
+        'methodology': 'Metodologia',
+        'data_preprocessing': 'Pré-processamento dos Dados',
+        'data_cleaning': 'Limpeza e normalização dos datasets da NASA',
+        'outlier_removal': 'Remoção de outliers usando métodos estatísticos',
+        'class_balancing': 'Balanceamento de classes com SMOTE',
+        'models_used': 'Modelos Utilizados',
+        'random_forest_desc': 'Random Forest: Robusto para dados ruidosos astronômicos',
+        'xgboost_desc': 'XGBoost: Alta precisão para padrões complexos',
+        'lightgbm_desc': 'LightGBM: Eficiência computacional otimizada',
+        'models_label': 'Modelos',
+        'score_label': 'Score',
+        'accuracy_label': 'Acurácia',
+        'precision_label': 'Precisão',
+        'recall_label': 'Recall',
+        'f1_score_label': 'F1-Score',
         'analyze': 'Analisar',
         'prediction_result': 'Resultado da Predição',
         'confidence': 'Confiança',
@@ -178,7 +194,23 @@ TRANSLATIONS = {
         'data_cleared': 'Data cleared successfully!',
         'reset_description': 'Clears all simulated data to allow upload of your own data',
         'confirm': 'Confirm',
-        'cancel': 'Cancel'
+        'cancel': 'Cancel',
+        'about_system': 'About the System',
+        'methodology': 'Methodology',
+        'data_preprocessing': 'Data Pre-processing',
+        'data_cleaning': 'Cleaning and normalization of NASA datasets',
+        'outlier_removal': 'Outlier removal using statistical methods',
+        'class_balancing': 'Class balancing with SMOTE',
+        'models_used': 'Models Used',
+        'random_forest_desc': 'Random Forest: Robust for noisy astronomical data',
+        'xgboost_desc': 'XGBoost: High precision for complex patterns',
+        'lightgbm_desc': 'LightGBM: Optimized computational efficiency',
+        'models_label': 'Models',
+        'score_label': 'Score',
+        'accuracy_label': 'Accuracy',
+        'precision_label': 'Precision',
+        'recall_label': 'Recall',
+        'f1_score_label': 'F1-Score',
     },
     'es': {
         'page_title': 'Detección de Exoplanetas con IA',
@@ -254,7 +286,23 @@ TRANSLATIONS = {
         'data_cleared': '¡Datos limpiados exitosamente!',
         'reset_description': 'Limpia todos los datos simulados para permitir la carga de datos propios',
         'confirm': 'Confirmar',
-        'cancel': 'Cancelar'
+        'cancel': 'Cancelar',
+        'about_system': 'Acerca del Sistema',
+        'methodology': 'Metodología',
+        'data_preprocessing': 'Preprocesamiento de Datos',
+        'data_cleaning': 'Limpieza y normalización de datasets de la NASA',
+        'outlier_removal': 'Eliminación de valores atípicos usando métodos estadísticos',
+        'class_balancing': 'Balanceo de clases con SMOTE',
+        'models_used': 'Modelos Utilizados',
+        'random_forest_desc': 'Random Forest: Robusto para datos astronómicos ruidosos',
+        'xgboost_desc': 'XGBoost: Alta precisión para patrones complejos',
+        'lightgbm_desc': 'LightGBM: Eficiencia computacional optimizada',
+        'models_label': 'Modelos',
+        'score_label': 'Puntuación',
+        'accuracy_label': 'Precisión',
+        'precision_label': 'Exactitud',
+        'recall_label': 'Recuperación',
+        'f1_score_label': 'F1-Score',
     }
 }
 
@@ -264,10 +312,6 @@ def get_translation(key, lang='pt'):
 
 def clear_all_data():
     """Limpa todos os dados simulados e cache"""
-    # Limpar cache do Streamlit
-    st.cache_data.clear()
-    st.cache_resource.clear()
-    
     # Limpar dados da sessão
     if 'real_time_data' in st.session_state:
         del st.session_state['real_time_data']
@@ -275,6 +319,10 @@ def clear_all_data():
     # Limpar dados de upload
     if 'uploaded_data' in st.session_state:
         del st.session_state['uploaded_data']
+    
+    # Limpar estado de confirmação
+    if 'confirm_reset' in st.session_state:
+        del st.session_state['confirm_reset']
     
     return True
 
@@ -828,15 +876,15 @@ def main():
     # Gráfico comparativo
         fig_comparison = go.Figure()
 
-        fig_comparison.add_trace(go.Bar(name='Acurácia', x=models, y=accuracy, marker_color='#667eea'))
-        fig_comparison.add_trace(go.Bar(name='Precisão', x=models, y=precision, marker_color='#764ba2'))
-        fig_comparison.add_trace(go.Bar(name='Recall', x=models, y=recall, marker_color='#f093fb'))
-        fig_comparison.add_trace(go.Bar(name='F1-Score', x=models, y=f1_score, marker_color='#f5576c'))
+        fig_comparison.add_trace(go.Bar(name=get_translation("accuracy_label", selected_language), x=models, y=accuracy, marker_color='#667eea'))
+        fig_comparison.add_trace(go.Bar(name=get_translation("precision_label", selected_language), x=models, y=precision, marker_color='#764ba2'))
+        fig_comparison.add_trace(go.Bar(name=get_translation("recall_label", selected_language), x=models, y=recall, marker_color='#f093fb'))
+        fig_comparison.add_trace(go.Bar(name=get_translation("f1_score_label", selected_language), x=models, y=f1_score, marker_color='#f5576c'))
 
         fig_comparison.update_layout(
         title=get_translation("model_comparison", selected_language),
-        xaxis_title="Modelos",
-        yaxis_title="Score",
+        xaxis_title=get_translation("models_label", selected_language),
+        yaxis_title=get_translation("score_label", selected_language),
         barmode='group',
         height=400
     )
@@ -846,23 +894,22 @@ def main():
     with tab4:
         st.header(get_translation("documentation", selected_language))
         
-        st.subheader("Sobre o Sistema")
-        st.markdown("""
+        st.subheader(get_translation("about_system", selected_language))
+        st.markdown(f"""
         Este sistema utiliza **Inteligência Artificial** para identificar e classificar exoplanetas 
         usando dados das missões Kepler, K2 e TESS da NASA.
         
-        ### 🔬 Metodologia
+        ### 🔬 {get_translation("methodology", selected_language)}
         
-        **1. Pré-processamento dos Dados**
-        - Limpeza e normalização dos datasets da NASA
-        - Remoção de outliers usando métodos estatísticos
-        - Balanceamento de classes com SMOTE
+        **1. {get_translation("data_preprocessing", selected_language)}**
+        - {get_translation("data_cleaning", selected_language)}
+        - {get_translation("outlier_removal", selected_language)}
+        - {get_translation("class_balancing", selected_language)}
         
-        
-        **3. Modelos Utilizados**
-        - **Random Forest**: Robust para dados ruidosos astronômicos
-        - **XGBoost**: Alta precisão para padrões complexos
-        - **LightGBM**: Eficiência computacional otimizada
+        **3. {get_translation("models_used", selected_language)}**
+        - **Random Forest**: {get_translation("random_forest_desc", selected_language)}
+        - **XGBoost**: {get_translation("xgboost_desc", selected_language)}
+        - **LightGBM**: {get_translation("lightgbm_desc", selected_language)}
         - **Ensemble**: Combinação para máxima robustez
         
         ### Variáveis de Análise
