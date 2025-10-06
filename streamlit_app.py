@@ -11,6 +11,7 @@ from plotly.subplots import make_subplots
 import json
 import time
 from datetime import datetime, timedelta
+from scipy.interpolate import griddata
 
 # Importar nosso sistema ML
 from exoplanet_ml import ExoplanetDetector
@@ -771,7 +772,6 @@ def main():
         X, Y = np.meshgrid(x_grid, y_grid)
         
         # Interpolar valores para o grid
-        from scipy.interpolate import griddata
         Z = griddata((n_est_norm, max_dep_norm), z, (X, Y), method='cubic')
         
         fig_hyperparams.add_trace(go.Contour(
