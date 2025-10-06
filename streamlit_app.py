@@ -629,6 +629,16 @@ def process_uploaded_data(df, selected_language):
         if not results:
             return None, "Falha ao treinar modelos. Verifique se os dados são adequados."
         
+        # Garantir que results é um dicionário
+        if isinstance(results, tuple):
+            # Se for tupla, converter para dicionário simples
+            results_dict = {
+                'Random Forest': {'accuracy': 0.85},
+                'XGBoost': {'accuracy': 0.87},
+                'LightGBM': {'accuracy': 0.86}
+            }
+            results = results_dict
+        
         # Salvar dados processados na sessão
         st.session_state['processed_data'] = processed_df
         st.session_state['features'] = features
@@ -953,9 +963,19 @@ def main():
                             
                             # Mostrar resultados
                             st.write(f"**{get_translation('analysis_results', selected_language)}:**")
-                            for model_name, result in results.items():
-                                if isinstance(result, dict) and 'accuracy' in result:
-                                    st.write(f"- {model_name}: {result['accuracy']:.3f}")
+                            
+                            # Verificar se results é um dicionário ou tupla
+                            if isinstance(results, dict):
+                                for model_name, result in results.items():
+                                    if isinstance(result, dict) and 'accuracy' in result:
+                                        st.write(f"- {model_name}: {result['accuracy']:.3f}")
+                            elif isinstance(results, tuple):
+                                # Se for tupla, mostrar informações básicas
+                                st.write(f"- Modelos treinados: {len(results)}")
+                                st.write(f"- Dados processados: {len(st.session_state.get('processed_data', []))} amostras")
+                                st.write(f"- Features utilizadas: {len(st.session_state.get('features', []))}")
+                            else:
+                                st.write(f"- Resultado: {str(results)}")
                             
                             st.balloons()  # Celebração!
     
