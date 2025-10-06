@@ -711,18 +711,28 @@ def initialize_detector():
 # CSS customizado com fundo estrelado
 st.markdown("""
 <style>
-    /* Fundo estrelado simplificado */
+    /* Fundo estrelado melhorado - última camada */
     .stApp {
         background: 
             radial-gradient(1px 1px at 20px 30px, white, transparent),
-            radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.9), transparent),
             radial-gradient(1px 1px at 90px 40px, white, transparent),
-            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
             radial-gradient(1px 1px at 160px 30px, white, transparent),
+            radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 250px 20px, white, transparent),
+            radial-gradient(1px 1px at 300px 90px, rgba(255,255,255,0.6), transparent),
             linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%) !important;
-        background-repeat: repeat, repeat, repeat, repeat, repeat, no-repeat !important;
-        background-size: 200px 150px, 200px 150px, 200px 150px, 200px 150px, 200px 150px, 100% 100% !important;
+        background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat !important;
+        background-size: 200px 150px, 200px 150px, 200px 150px, 200px 150px, 200px 150px, 200px 150px, 200px 150px, 200px 150px, 100% 100% !important;
         background-attachment: fixed !important;
+        z-index: -1 !important;
+    }
+    
+    /* Garantir que o conteúdo fique acima do background */
+    .main .block-container {
+        background: rgba(0, 0, 0, 0.1) !important;
+        backdrop-filter: blur(1px) !important;
     }
     
     .main-header {
@@ -1462,19 +1472,19 @@ def main():
             col_p1, col_p2, col_p3 = st.columns(3)
 
             with col_p1:
-                orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=365.25, key="manual_orbital_period")
-                transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=8.0, key="manual_transit_duration")
-                planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.0, key="manual_planet_radius")
+                orbital_period = st.number_input(get_translation("orbital_period", selected_language), min_value=0.1, value=3.5, key="manual_orbital_period", help="Período orbital em dias")
+                transit_duration = st.number_input(get_translation("transit_duration", selected_language), min_value=0.1, value=2.5, key="manual_transit_duration", help="Duração do trânsito em horas")
+                planet_radius = st.number_input(get_translation("planet_radius", selected_language), min_value=0.1, value=1.2, key="manual_planet_radius", help="Raio planetário em raios terrestres")
 
             with col_p2:
-                stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0, key="manual_stellar_mass")
-                stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0, key="manual_stellar_radius")
-                equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=300.0, key="manual_equilibrium_temp")
+                stellar_mass = st.number_input(get_translation("stellar_mass", selected_language), min_value=0.1, value=1.0, key="manual_stellar_mass", help="Massa estelar em massas solares")
+                stellar_radius = st.number_input(get_translation("stellar_radius", selected_language), min_value=0.1, value=1.0, key="manual_stellar_radius", help="Raio estelar em raios solares")
+                equilibrium_temp = st.number_input(get_translation("equilibrium_temp", selected_language), min_value=100.0, value=500.0, key="manual_equilibrium_temp", help="Temperatura de equilíbrio em Kelvin")
 
             with col_p3:
-                impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.5, key="manual_impact_parameter")
-                stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4, key="manual_stellar_density")
-                kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0, key="manual_kepmag")
+                impact_parameter = st.number_input(get_translation("impact_parameter", selected_language), min_value=0.0, max_value=1.0, value=0.3, key="manual_impact_parameter", help="Parâmetro de impacto (0-1)")
+                stellar_density = st.number_input(get_translation("stellar_density", selected_language), min_value=0.1, value=1.4, key="manual_stellar_density", help="Densidade estelar em g/cm³")
+                kepmag = st.number_input(get_translation("kepmag", selected_language), min_value=8.0, max_value=16.0, value=12.0, key="manual_kepmag", help="Magnitude Kepler")
 
             if st.button(get_translation("analyze", selected_language)):
                 st.info("🔬 **Modo de análise manual** - Para análise completa, faça upload de dados na aba 'Análise'")
