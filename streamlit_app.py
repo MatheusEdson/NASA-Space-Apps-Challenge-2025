@@ -378,13 +378,28 @@ def safe_read_file(uploaded_file, selected_language):
             for encoding in encodings:
                 try:
                     uploaded_file.seek(0)  # Reset file pointer
-                    df = pd.read_csv(uploaded_file, encoding=encoding)
+                    
+                    # Ler arquivo linha por linha para detectar problemas
+                    lines = []
+                    for line in uploaded_file:
+                        line_str = line.decode(encoding).strip()
+                        # Pular linhas de comentário (começam com #)
+                        if not line_str.startswith('#') and line_str:
+                            lines.append(line_str)
+                    
+                    if not lines:
+                        continue
+                    
+                    # Tentar ler como CSV
+                    uploaded_file.seek(0)
+                    df = pd.read_csv(uploaded_file, encoding=encoding, comment='#', skip_blank_lines=True)
                     break
-                except UnicodeDecodeError:
+                    
+                except (UnicodeDecodeError, pd.errors.ParserError) as e:
                     continue
             
             if df is None:
-                return None, "Não foi possível ler o arquivo CSV. Verifique a codificação."
+                return None, "Não foi possível ler o arquivo CSV. Arquivo pode ter formato incompatível."
                 
         elif uploaded_file.name.endswith('.xlsx'):
             df = pd.read_excel(uploaded_file)
@@ -399,6 +414,9 @@ def safe_read_file(uploaded_file, selected_language):
         if len(df.columns) < 3:
             return None, "Arquivo deve ter pelo menos 3 colunas de dados."
         
+        # Limpar colunas com nomes estranhos
+        df.columns = df.columns.str.strip()
+        
         return df, None
         
     except Exception as e:
@@ -409,15 +427,15 @@ def validate_dataframe(df, selected_language):
     try:
         # Colunas obrigatórias (flexível - aceita variações)
         required_columns = {
-            'koi_name': ['koi_name', 'name', 'object_name', 'planet_name'],
-            'koi_period': ['koi_period', 'period', 'orbital_period'],
-            'koi_depth': ['koi_depth', 'depth', 'transit_depth'],
-            'koi_duration': ['koi_duration', 'duration', 'transit_duration'],
-            'koi_prad': ['koi_prad', 'prad', 'planet_radius'],
-            'koi_teq': ['koi_teq', 'teq', 'equilibrium_temperature'],
-            'koi_insol': ['koi_insol', 'insol', 'stellar_irradiance'],
-            'koi_impact': ['koi_impact', 'impact', 'impact_parameter'],
-            'koi_disposition': ['koi_disposition', 'disposition', 'classification']
+            'koi_name': ['koi_name', 'name', 'object_name', 'planet_name', 'pl_name'],
+            'koi_period': ['koi_period', 'period', 'orbital_period', 'pl_orbper'],
+            'koi_depth': ['koi_depth', 'depth', 'transit_depth', 'pl_trandep'],
+            'koi_duration': ['koi_duration', 'duration', 'transit_duration', 'pl_trandur'],
+            'koi_prad': ['koi_prad', 'prad', 'planet_radius', 'pl_rade', 'pl_radj'],
+            'koi_teq': ['koi_teq', 'teq', 'equilibrium_temperature', 'pl_eqt'],
+            'koi_insol': ['koi_insol', 'insol', 'stellar_irradiance', 'pl_insol'],
+            'koi_impact': ['koi_impact', 'impact', 'impact_parameter', 'pl_imppar'],
+            'koi_disposition': ['koi_disposition', 'disposition', 'classification', 'pl_status']
         }
         
         # Verificar se encontramos pelo menos algumas colunas essenciais
@@ -430,12 +448,12 @@ def validate_dataframe(df, selected_language):
                     found_columns[required_key] = possible_name
                     break
         
-        # Verificar se temos pelo menos 5 colunas essenciais
-        essential_columns = ['koi_name', 'koi_period', 'koi_depth', 'koi_prad', 'koi_disposition']
+        # Verificar se temos pelo menos algumas colunas essenciais
+        essential_columns = ['koi_name', 'koi_period', 'koi_depth', 'koi_prad']
         found_essential = sum(1 for col in essential_columns if col in found_columns)
         
-        if found_essential < 3:
-            return False, f"Apenas {found_essential} colunas essenciais encontradas. Necessário pelo menos 3."
+        if found_essential < 2:
+            return False, f"Apenas {found_essential} colunas essenciais encontradas. Necessário pelo menos 2."
         
         # Verificar se há dados válidos
         numeric_columns = ['koi_period', 'koi_depth', 'koi_prad']
@@ -445,7 +463,7 @@ def validate_dataframe(df, selected_language):
                 if not pd.api.types.is_numeric_dtype(df[col_name]):
                     return False, f"Coluna '{col_name}' deve conter valores numéricos."
         
-        return True, "Dados válidos"
+        return True, f"Dados válidos! Encontradas {found_essential} colunas essenciais."
         
     except Exception as e:
         return False, f"Erro na validação: {str(e)}"
@@ -747,6 +765,9 @@ def main():
                         'koi_disposition': ['CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE']
                     })
                     
+                    st.write("**Dados de teste criados:**")
+                    st.dataframe(test_data)
+                    
                     # Testar validação
                     is_valid, validation_msg = validate_dataframe(test_data, selected_language)
                     
@@ -772,6 +793,8 @@ def main():
                         
                 except Exception as e:
                     st.error(f"❌ **Erro no teste:** {str(e)}")
+                    st.write("**Detalhes do erro:**")
+                    st.code(str(e))
         
         st.info("💡 **Dica:** Use este teste para verificar se o sistema está funcionando antes de fazer upload de seus dados.")
         
