@@ -378,14 +378,13 @@ def get_real_time_data():
     return data
 
 def main():
-    # Obter idioma selecionado
-    selected_language = get_language_selector()
-
-    # Header principal
-    st.markdown(f'<h1 class="main-header">{get_translation("main_header", selected_language)}</h1>', unsafe_allow_html=True)
+    # Header principal (sempre em português para título da página)
+    st.markdown(f'<h1 class="main-header">{get_translation("main_header", "pt")}</h1>', unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
+        # Obter idioma selecionado
+        selected_language = get_language_selector()
         st.header(get_translation("system_controls", selected_language))
         
         # Status do sistema
@@ -465,6 +464,8 @@ def main():
     status_text = st.empty()
     
     with tab1:
+        # Obter idioma selecionado para esta aba
+        selected_language = get_language_selector()
         st.header(get_translation("real_time_analysis", selected_language))
         
         # Botão de atualização manual
@@ -585,6 +586,20 @@ def main():
         np.random.seed(42)
         n_samples = 50  # Reduzido de 100 para 50
         
+        # Lista de nomes de planetas reais para as amostras
+        planet_names = [
+            "Kepler-452b", "Kepler-186f", "Kepler-442b", "Kepler-62f", "Kepler-296f",
+            "Kepler-438b", "Kepler-440b", "Kepler-1229b", "Kepler-1544b", "Kepler-1638b",
+            "Kepler-1649c", "Kepler-1652b", "Kepler-1653b", "Kepler-1701b", "Kepler-1726b",
+            "Kepler-1749b", "Kepler-1755b", "Kepler-1776b", "Kepler-1781b", "Kepler-1783b",
+            "Kepler-1785b", "Kepler-1787b", "Kepler-1789b", "Kepler-1791b", "Kepler-1793b",
+            "Kepler-1795b", "Kepler-1797b", "Kepler-1799b", "Kepler-1801b", "Kepler-1803b",
+            "Kepler-1805b", "Kepler-1807b", "Kepler-1809b", "Kepler-1811b", "Kepler-1813b",
+            "Kepler-1815b", "Kepler-1817b", "Kepler-1819b", "Kepler-1821b", "Kepler-1823b",
+            "Kepler-1825b", "Kepler-1827b", "Kepler-1829b", "Kepler-1831b", "Kepler-1833b",
+            "Kepler-1835b", "Kepler-1837b", "Kepler-1839b", "Kepler-1841b", "Kepler-1843b"
+        ]
+        
         # Hyperparâmetros reais do Random Forest
         n_estimators = np.random.uniform(50, 200, n_samples)  # Número de árvores
         max_depth = np.random.uniform(3, 20, n_samples)       # Profundidade máxima
@@ -640,12 +655,12 @@ def main():
                 line=dict(width=1, color='white')
             ),
             name=get_translation("samples", selected_language),
-            hovertemplate='<b>' + get_translation("sample", selected_language) + '</b><br>' +
-                         'N_Estimators: %{customdata[0]:.0f}<br>' +
-                         'Max_Depth: %{customdata[1]:.1f}<br>' +
-                         'Score: %{customdata[2]:.3f}<br>' +
+            hovertemplate='<b>%{customdata[0]}</b><br>' +
+                         'N_Estimators: %{customdata[1]:.0f}<br>' +
+                         'Max_Depth: %{customdata[2]:.1f}<br>' +
+                         'Score: %{customdata[3]:.3f}<br>' +
                          '<extra></extra>',
-            customdata=np.column_stack((n_estimators, max_depth, z))
+            customdata=np.column_stack((planet_names[:n_samples], n_estimators, max_depth, z))
         ))
         
         fig_hyperparams.update_layout(
@@ -662,6 +677,8 @@ def main():
         st.plotly_chart(fig_hyperparams, use_container_width=True)
     
     with tab2:
+        # Obter idioma selecionado para esta aba
+        selected_language = get_language_selector()
         st.header(get_translation("manual_analysis", selected_language))
 
         col_p1, col_p2, col_p3 = st.columns(3)
@@ -720,6 +737,8 @@ def main():
         st.plotly_chart(fig_probs, use_container_width=True)
 
     with tab3:
+        # Obter idioma selecionado para esta aba
+        selected_language = get_language_selector()
         st.header(get_translation("model_performance", selected_language))
 
     # Simular dados de performance
@@ -772,7 +791,9 @@ def main():
         st.plotly_chart(fig_comparison, use_container_width=True)
     
     with tab4:
-        st.header("Documentação e Recursos")
+        # Obter idioma selecionado para esta aba
+        selected_language = get_language_selector()
+        st.header(get_translation("documentation", selected_language))
         
         st.subheader("Sobre o Sistema")
         st.markdown("""
