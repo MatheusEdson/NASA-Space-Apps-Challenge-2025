@@ -93,7 +93,10 @@ TRANSLATIONS = {
         'columns': 'Colunas',
         'analyze_data': 'Analisar Dados',
         'analyzing': 'Analisando dados...',
-        'analysis_complete': 'Análise concluída com sucesso!',
+        'analysis_results': 'Resultados da Análise',
+        'system_description': 'Este sistema utiliza **Inteligência Artificial** para identificar e classificar exoplanetas usando dados das missões Kepler, K2 e TESS da NASA.',
+        'ensemble_desc': 'Combinação para máxima robustez',
+        'system_paused': 'Sistema PAUSADO',
         'about_system': 'Sobre o Sistema',
         'methodology': 'Metodologia',
         'data_preprocessing': 'Pré-processamento dos Dados',
@@ -217,7 +220,10 @@ TRANSLATIONS = {
         'columns': 'Columns',
         'analyze_data': 'Analyze Data',
         'analyzing': 'Analyzing data...',
-        'analysis_complete': 'Analysis completed successfully!',
+        'analysis_results': 'Analysis Results',
+        'system_description': 'This system uses **Artificial Intelligence** to identify and classify exoplanets using data from NASA\'s Kepler, K2 and TESS missions.',
+        'ensemble_desc': 'Combination for maximum robustness',
+        'system_paused': 'System PAUSED',
         'about_system': 'About the System',
         'methodology': 'Methodology',
         'data_preprocessing': 'Data Pre-processing',
@@ -325,7 +331,10 @@ TRANSLATIONS = {
         'columns': 'Columnas',
         'analyze_data': 'Analizar Datos',
         'analyzing': 'Analizando datos...',
-        'analysis_complete': 'Análisis completado exitosamente!',
+        'analysis_results': 'Resultados del Análisis',
+        'system_description': 'Este sistema utiliza **Inteligencia Artificial** para identificar y clasificar exoplanetas usando datos de las misiones Kepler, K2 y TESS de la NASA.',
+        'ensemble_desc': 'Combinación para máxima robustez',
+        'system_paused': 'Sistema PAUSADO',
         'about_system': 'Acerca del Sistema',
         'methodology': 'Metodología',
         'data_preprocessing': 'Preprocesamiento de Datos',
@@ -526,9 +535,9 @@ def main():
         system_status = st.radio("Status:", [get_translation("active", selected_language), get_translation("paused", selected_language)], key="status")
         
         if system_status == get_translation("active", selected_language):
-            st.markdown('<p class="status-running">● Sistema ATIVO</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="status-running">● {get_translation("system_active", selected_language)}</p>', unsafe_allow_html=True)
         else:
-            st.markdown('<p class="status-stopped">● Sistema PAUSADO</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="status-stopped">● {get_translation("system_paused", selected_language)}</p>', unsafe_allow_html=True)
         
         # Explicação do Sistema Ativo/Desativo
         with st.expander("ℹ️ O que significa Sistema Ativo/Desativo?"):
@@ -650,7 +659,7 @@ def main():
                                 st.success(get_translation("analysis_complete", selected_language))
                                 
                                 # Mostrar resultados
-                                st.write("**Resultados da Análise:**")
+                                st.write(f"**{get_translation('analysis_results', selected_language)}:**")
                                 for model_name, result in results.items():
                                     if isinstance(result, dict) and 'accuracy' in result:
                                         st.write(f"- {model_name}: {result['accuracy']:.3f}")
@@ -1012,9 +1021,8 @@ def main():
         st.header(get_translation("documentation", selected_language))
         
         st.subheader(get_translation("about_system", selected_language))
-        st.markdown("""
-        Este sistema utiliza **Inteligência Artificial** para identificar e classificar exoplanetas 
-        usando dados das missões Kepler, K2 e TESS da NASA.
+        st.markdown(f"""
+        {get_translation("system_description", selected_language)}
         """)
         
         st.markdown(f"""
@@ -1029,7 +1037,7 @@ def main():
         - **Random Forest**: {get_translation("random_forest_desc", selected_language)}
         - **XGBoost**: {get_translation("xgboost_desc", selected_language)}
         - **LightGBM**: {get_translation("lightgbm_desc", selected_language)}
-        - **Ensemble**: Combinação para máxima robustez
+        - **Ensemble**: {get_translation("ensemble_desc", selected_language)}
         """)
         
         st.markdown(f"""
