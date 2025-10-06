@@ -278,8 +278,8 @@ def clear_all_data():
     
     return True
 
-def get_language_selector():
-    """Cria o seletor de idioma"""
+def get_language_selector(context='sidebar'):
+    """Cria o seletor de idioma com chave única baseada no contexto"""
     languages = {
         '🇧🇷 Português': 'pt',
         '🇺🇸 English': 'en', 
@@ -290,7 +290,7 @@ def get_language_selector():
         "Idioma / Language / Idioma:",
         options=list(languages.keys()),
         index=0,
-        key="language_selector"
+        key=f"language_selector_{context}"
     )
     
     return languages[selected_lang]
@@ -418,7 +418,7 @@ def main():
     # Sidebar
     with st.sidebar:
         # Obter idioma selecionado
-        selected_language = get_language_selector()
+        selected_language = get_language_selector('sidebar')
         st.header(get_translation("system_controls", selected_language))
         
         # Status do sistema
@@ -524,7 +524,7 @@ def main():
     
     with tab1:
         # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector()
+        selected_language = get_language_selector('dashboard')
         st.header(get_translation("real_time_analysis", selected_language))
         
         # Botão de atualização manual
@@ -737,7 +737,7 @@ def main():
     
     with tab2:
         # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector()
+        selected_language = get_language_selector('analysis')
         st.header(get_translation("manual_analysis", selected_language))
 
         col_p1, col_p2, col_p3 = st.columns(3)
@@ -797,7 +797,7 @@ def main():
 
     with tab3:
         # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector()
+        selected_language = get_language_selector('performance')
         st.header(get_translation("model_performance", selected_language))
 
     # Simular dados de performance
@@ -851,7 +851,7 @@ def main():
     
     with tab4:
         # Obter idioma selecionado para esta aba
-        selected_language = get_language_selector()
+        selected_language = get_language_selector('documentation')
         st.header(get_translation("documentation", selected_language))
         
         st.subheader("Sobre o Sistema")
