@@ -478,6 +478,25 @@ def process_uploaded_data(df, selected_language):
     try:
         detector = initialize_detector()
         
+        # Verificar se há dados suficientes para treinamento
+        if len(df) < 6:
+            return None, f"Dados insuficientes para treinamento. Necessário pelo menos 6 amostras, encontradas {len(df)}."
+        
+        # Verificar se há pelo menos 2 amostras por classe (se houver coluna de classificação)
+        classification_columns = ['koi_disposition', 'disposition', 'classification', 'pl_status']
+        classification_col = None
+        
+        for col in classification_columns:
+            if col in df.columns:
+                classification_col = col
+                break
+        
+        if classification_col:
+            class_counts = df[classification_col].value_counts()
+            min_samples = class_counts.min()
+            if min_samples < 2:
+                return None, f"Classes desbalanceadas. Classe menos frequente tem apenas {min_samples} amostra(s). Necessário pelo menos 2 por classe."
+        
         # Preparar dados para processamento
         processed_df, features = detector.preprocess_data(df)
         
@@ -757,17 +776,17 @@ def main():
         if st.button("Testar Sistema com Dados de Exemplo", type="secondary"):
             with st.spinner("Executando teste..."):
                 try:
-                    # Criar dados de teste
+                    # Criar dados de teste com mais amostras por classe
                     test_data = pd.DataFrame({
-                        'koi_name': ['TEST-001', 'TEST-002', 'TEST-003'],
-                        'koi_period': [3.5, 5.2, 2.1],
-                        'koi_depth': [0.001, 0.002, 0.0015],
-                        'koi_duration': [2.5, 3.1, 1.8],
-                        'koi_prad': [1.2, 0.8, 1.5],
-                        'koi_teq': [500, 400, 600],
-                        'koi_insol': [1.5, 0.8, 2.1],
-                        'koi_impact': [0.3, 0.1, 0.5],
-                        'koi_disposition': ['CONFIRMED', 'CANDIDATE', 'FALSE POSITIVE']
+                        'koi_name': ['TEST-001', 'TEST-002', 'TEST-003', 'TEST-004', 'TEST-005', 'TEST-006'],
+                        'koi_period': [3.5, 5.2, 2.1, 4.1, 6.3, 1.8],
+                        'koi_depth': [0.001, 0.002, 0.0015, 0.0012, 0.0025, 0.0008],
+                        'koi_duration': [2.5, 3.1, 1.8, 2.8, 3.5, 1.5],
+                        'koi_prad': [1.2, 0.8, 1.5, 1.1, 0.9, 1.8],
+                        'koi_teq': [500, 400, 600, 450, 350, 700],
+                        'koi_insol': [1.5, 0.8, 2.1, 1.2, 0.6, 2.5],
+                        'koi_impact': [0.3, 0.1, 0.5, 0.2, 0.15, 0.6],
+                        'koi_disposition': ['CONFIRMED', 'CONFIRMED', 'CANDIDATE', 'CANDIDATE', 'FALSE POSITIVE', 'FALSE POSITIVE']
                     })
                     
                     st.write("**Dados de teste criados:**")
